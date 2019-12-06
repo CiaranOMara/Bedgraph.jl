@@ -1,7 +1,8 @@
 # Check if the record data is in the four column BED format.
 function isLikeRecord(line::AbstractString)
-    return  occursin(r"^\s*\S*(?=[A-Za-z0-9])\S*\s+(\d+)\s+(\d+)\s+(\S*\d)\s*$", line) # Note: is like a record.
+    return occursin(r"^\s*\S*(?=[A-Za-z0-9])\S*\s+(\d+)\s+(\d+)\s+(\S*\d)\s*$", line) # Note: is like a record.
 end
+isLikeRecord(io::IO) = isLikeRecord(String(take!(io)))
 
 function isBrowser(line::AbstractString)
     return  occursin(r"^browser", lowercase(line))
@@ -47,13 +48,18 @@ end
 
 function readRecord(io::IO) :: Union{Nothing, Record}
 
-    line = readline(io)
+    line = IOBuffer(readline(io))
 
     if isLikeRecord(line)
-        return Record(line)
+        return read(line, Record)
     end
 
     return nothing
+end
+
+function Base.read(io::IO, obj::Type{Record})
+    line = readline(io)
+    return obj(line)
 end
 
 function readRecords(io::IO)
