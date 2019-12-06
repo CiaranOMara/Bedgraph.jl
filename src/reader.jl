@@ -62,23 +62,24 @@ function Base.read(io::IO, obj::Type{Record})
     return obj(line)
 end
 
-function readRecords(io::IO)
+function readRecords(io::IO, sink)
     seekstart(io)
     seekNextRecord(io)
-
-    records = Vector{Record}()
 
     while !eof(io)
         record = readRecord(io)
         if record != nothing
-            push!(records, record)
+            push!(sink, record) #Note: converts Record to sink's eltype.
         end
     end
 
-    return records
+    return sink
 
 end
 
-function Base.read(io::IO, ::Type{<:AbstractVector{Record}})
-    return readRecords(io)
+readRecords(io::IO, sink::Type) = readRecords(io::IO, sink())
+readRecords(io::IO) = readRecords(io::IO, Vector{Record})
+
+function Base.read(io::IO, ::Type{T}) where {T<:AbstractVector{Record}}
+    return readRecords(io, T)
 end
