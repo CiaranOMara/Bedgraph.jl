@@ -5,7 +5,6 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/jny2ep4u3cmly8pj/branch/master?svg=true)](https://ci.appveyor.com/project/CiaranOMara/Bedgraph-jl/branch/master)
 [![Build Status](https://api.cirrus-ci.com/github/CiaranOMara/Bedgraph.jl.svg?branch=master)](https://cirrus-ci.com/github/CiaranOMara/Bedgraph.jl)
 [![codecov.io](http://codecov.io/github/CiaranOMara/Bedgraph.jl/coverage.svg?branch=master)](http://codecov.io/github/CiaranOMara/Bedgraph.jl?branch=master)
-[![Coverage Status](https://coveralls.io/repos/github/CiaranOMara/Bedgraph.jl/badge.svg?branch=master)](https://coveralls.io/github/CiaranOMara/Bedgraph.jl?branch=master)
 
 > This project will try to follow the [semver](http://semver.org) pro forma.
 
