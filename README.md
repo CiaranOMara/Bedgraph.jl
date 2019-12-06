@@ -55,11 +55,9 @@ end
 Alternatively you may want to read and process records individually.
 ```julia
 open(file, "r") do io
-    while !eof(io)
-        record = readRecord(io)
-        if record != nothing
-            # Process record.
-        end
+    while !eof(seek(io, Bedgraph.Record))
+        record = read(io, Bedgraph.Record) #Note: no protection.
+        # Process record.
     end
 end
 ```

@@ -15,12 +15,15 @@ end
 function seekNextRecord(io::IO)
 
     pos = position(io)
-    initial = pos == 0 ? -1 : pos # Note: Allows for the fist line of headerless bedGraph file to be read.
-    line = ""
 
-    while !eof(io) && (!isLikeRecord(line) || pos == initial)
+    while !eof(io)
         pos = position(io)
         line = readline(io)
+
+        if isLikeRecord(line)
+            break
+        end
+
     end
 
     return seek(io, pos)
@@ -64,13 +67,10 @@ end
 
 function readRecords(io::IO, sink)
     seekstart(io)
-    seekNextRecord(io)
 
-    while !eof(io)
-        record = readRecord(io)
-        if record != nothing
-            push!(sink, record) #Note: converts Record to sink's eltype.
-        end
+    while !eof(seek(io, Record))
+        record = read(io, Record)
+        push!(sink, record) #Note: converts Record to sink's eltype.
     end
 
     return sink

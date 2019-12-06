@@ -88,9 +88,9 @@ open(Bag.file_headerless, "r") do io
     @test readline(io) == Bag.line1 # IO position is at the start of line 2.
 
 	# Check behaviour of consecutive calls to seek(io, Record).
-	seek(io, Record) # Skip to start of line 3.
-	seek(io, Record) # Skip to start of line 4.
-	@test readline(io) == Bag.line4
+	seek(io, Record)
+	seek(io, Record)
+	@test readline(io) == Bag.line2
 
 end
 
@@ -118,11 +118,9 @@ end
 @test Bag.records == open(Bag.file, "r") do io
 	records = Vector{Record}()
 
-    while !eof(io)
-        record = Bedgraph.readRecord(io)
-        if record != nothing
-            push!(records, record)
-        end
+	while !eof(seek(io, Bedgraph.Record))
+        record = read(io, Bedgraph.Record) #Note: no protection.
+        push!(records, record)
     end
 
     return records
