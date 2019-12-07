@@ -58,15 +58,6 @@ function Base.isless(a::Record, b::Record, chrom_isless::Function=isless)
 
 end
 
-function Record(data::AbstractVector{<:AbstractString})
-    return convert(Record, data)
-end
-
-function Base.convert(::Type{Record}, data::AbstractVector{<:AbstractString})
-    chrom, first, last, value = _convertCells(data)
-    return Record(chrom, first, last, value)
-end
-
 function Base.convert(::Type{Vector{String}}, record::Record)
     return String[record.chrom, string(record.first), string(record.last), string(record.value)]
 end
@@ -77,7 +68,7 @@ end
 
 function Base.convert(::Type{Record}, str::AbstractString)
     data = _splitLine(str)
-    return convert(Record, data)
+    return Record(data[1], data[2], data[3], data[4])
 end
 
 function chrom(record::Record)
@@ -99,8 +90,4 @@ end
 ## Internal helper functions.
 function _splitLine(line::AbstractString)
     return split(line, r"\s", limit=5, keepempty=false) #Note: may return 5 elements.
-end
-
-function _convertCells(cells::AbstractVector{<:AbstractString})
-    return cells[1], parse(Int, cells[2]), parse(Int, cells[3]), parse(Float64, cells[4]) #TODO: parse cell 4 as a generic Real.
 end

@@ -222,23 +222,10 @@ end #testset Sorting
 
 @testset "Conversion" begin
 
-@test_nowarn Bedgraph._convertCells([Bag.cells1; "extra_cell"]) == Bag.cells1
-
-c1, c2, c3, c4 = Bedgraph._convertCells(Bedgraph._splitLine(Bag.line1))
-
-@test typeof(c1) <: AbstractString
-@test typeof(c2) <: Int
-@test typeof(c3) <: Int
-@test typeof(c4) <: Real
-
-@test Record(Bag.line1) == Bag.record1
-@test convert(Record, Bag.line1) == Bag.record1
-
-@test Record(Bag.cells1) == Bag.record1
-@test convert(Record, Bag.cells1) == Bag.record1
-
-@test_nowarn convert(Record, string(Bag.line1, " ", "extra_cell")) #TODO: determine difference between MethodError and ErrorException.
-@test_nowarn convert(Record, [Bag.cells1; "extra_cell"])
+@test Bag.record1 == convert(Record, Bag.line1)
+@test Bag.record1 == Record(Bag.line1)
+@test Bag.record1 == convert(Record, string(Bag.line1, " ", "extra_cell"))
+@test Bag.record1 == Record(string(Bag.line1, " ", "extra_cell"))
 
 end #testset Conversion
 
