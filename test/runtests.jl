@@ -67,6 +67,12 @@ end # module bag
 
 @testset "Bedgraph" begin
 
+@testset "Record Constructor" begin
+	@test_nowarn Record("chr1", 1.0, 1.0, 1.1)
+	@test Record("chr1", 1.0, 1.0, 1.0) == Record("chr1", 1, 1, 1.0)
+	@test Record("chr1", "1.0", "1", "1.1") == Record("chr1", 1, 1, 1.1)
+end
+
 @testset "I/O" begin
 
 @test isfile(Bag.file)

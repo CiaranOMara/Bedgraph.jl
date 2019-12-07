@@ -5,7 +5,30 @@ struct Record
     first::Int
     last::Int
     value::Real
+
+    Record(chrom, first, last, value) = new(_string(chrom), _int(first), _int(last), _real(value))
 end
+
+function _int(pos)
+    return pos
+end
+
+function _string(str)
+    return str
+end
+
+function _real(x)
+    return x
+end
+
+function _int(str::AbstractString)
+    return parse(Float64, str) #Note: conversion to Int is completed when the Record is constructed.
+end
+
+function _real(str::AbstractString)
+    return parse(Float64, str)
+end
+
 
 function Base.:(==)(a::Record, b::Record)
     return a.chrom  == b.chrom &&
