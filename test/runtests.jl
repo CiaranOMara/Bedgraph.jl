@@ -99,19 +99,22 @@ open(Bag.file) do io
 	@test read!(io, Vector{Bedgraph.Record}(undef, length(Bag.records))) ==  Bag.records
 end
 
+@test_nowarn Bedgraph.BedgraphHeader()
+@test_nowarn Bedgraph.BedgraphHeader{Vector{String}}()
+
 @test read(Bag.file, Vector{Bedgraph.Record}) ==  Bag.records
 @test read(Bag.file, Bedgraph.BedgraphHeader{Vector{String}}).data == Bag.header
 
 
 open(Bag.file, "r") do io # Note: reading records first to check seek.
-    @test Bedgraph.readRecords(io) == Bag.records
-	@test Bedgraph._readHeader(io) == Bag.header
+    @test read(io, Vector{Record}) == Bag.records
+	@test read(io, Bedgraph.BedgraphHeader).data == Bag.header
 	@test read(io, Bedgraph.BedgraphHeader{Vector{String}}).data == Bag.header
 end
 
 open(Bag.file_headerless, "r") do io # Note: reading records first to check seek.
-    @test Bedgraph.readRecords(io) == Bag.records
-	@test Bedgraph._readHeader(io) == []
+	@test read(io, Vector{Record}) == Bag.records
+	@test read(io, Bedgraph.BedgraphHeader).data == []
     @test read(io, Bedgraph.BedgraphHeader{Vector{String}}).data == []
 end
 
