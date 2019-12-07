@@ -1,5 +1,6 @@
 export Record
 
+"The bedGraph record."
 struct Record
     chrom::String
     first::Int
@@ -71,18 +72,22 @@ function Base.convert(::Type{Record}, str::AbstractString)
     return Record(data[1], data[2], data[3], data[4])
 end
 
+"Access [`Record`](@ref)'s chrom field."
 function chrom(record::Record)
     return record.chrom
 end
 
+"Access [`Record`](@ref)'s left position."
 function Base.first(record::Record)
     return record.first
 end
 
+"Access [`Record`](@ref)'s last position."
 function Base.last(record::Record)
     return record.last
 end
 
+"Access [`Record`](@ref)'s value."
 function value(record::Record)
     return record.value
 end
