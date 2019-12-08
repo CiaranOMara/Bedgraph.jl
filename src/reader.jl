@@ -12,7 +12,6 @@ function isComment(line::AbstractString)
     return occursin(r"^\s*(?:#|$)", line)
 end
 
-
 function seekNextRecord(io::IO)
 
     pos = position(io)
@@ -24,10 +23,11 @@ function seekNextRecord(io::IO)
         line = readline(io)
     end
 
-    seek(io, pos)
+    return seek(io, pos)
+end
 
-    return nothing
-
+function Base.seek(io::IO, ::Type{Record})
+    return seekNextRecord(io)
 end
 
 # Note: all options are placed in a single line separated by spaces.

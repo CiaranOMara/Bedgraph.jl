@@ -47,9 +47,8 @@ records = read(file, Vector{Bedgraph.Record})
 ```julia
 using Bedgraph
 
-records = Vector{Record}()
-open(file, "r") do io
-    records = Bedgraph.readRecords(io)
+records = open(file, "r") do io
+    return read(io, Vector{Bedgraph.Record})
 end
 ```
 

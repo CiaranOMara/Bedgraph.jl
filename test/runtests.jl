@@ -74,7 +74,7 @@ end # module bag
 
 # Seek test.
 open(Bag.file, "r") do io
-    Bedgraph.seekNextRecord(io)
+    seek(io, Record)
     @test position(io) == 536
     @test readline(io) == Bag.line1
 end
@@ -83,19 +83,19 @@ end
 open(Bag.file_headerless, "r") do io
 
 	# Check that the first record of a headerless bedGraph file can be sought.
-    Bedgraph.seekNextRecord(io)
+    seek(io, Record)
     @test position(io) == 0
     @test readline(io) == Bag.line1 # IO position is at the start of line 2.
 
-	# Check behaviour of consecutive calls to Bedgraph.seekNextRecord(io).
-	Bedgraph.seekNextRecord(io) # Skip to start of line 3.
-	Bedgraph.seekNextRecord(io) # Skip to start of line 4.
+	# Check behaviour of consecutive calls to seek(io, Record).
+	seek(io, Record) # Skip to start of line 3.
+	seek(io, Record) # Skip to start of line 4.
 	@test readline(io) == Bag.line4
 
 end
 
 open(Bag.file) do io
-	Bedgraph.seekNextRecord(io)
+	seek(io, Record)
 	@test read!(io, Vector{Bedgraph.Record}(undef, length(Bag.records))) ==  Bag.records
 end
 
@@ -115,7 +115,7 @@ open(Bag.file_headerless, "r") do io # Note: reading records first to check seek
     @test read(io, Bedgraph.BedgraphHeader{Vector{String}}).data == []
 end
 
-@test  Bag.records == open(Bag.file, "r") do io
+@test Bag.records == open(Bag.file, "r") do io
 	records = Vector{Record}()
 
     while !eof(io)
@@ -130,7 +130,7 @@ end
 end
 
 @test Bag.records == open(Bag.file, "r") do io
-    Bedgraph.seekNextRecord(io)
+    seek(io, Bedgraph.Record)
     return read(io, Vector{Bedgraph.Record})
 end
 
