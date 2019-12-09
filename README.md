@@ -90,7 +90,7 @@ records = [Record("chr19", 49302000, 49302300, -1.0), Record("chr19", 49302300, 
 header = Bedgraph.generateBasicHeader("chr19", records[1].first, records[end].last, bump_forward=false)
 
 open(output_file, "w") do io
-    write(io, header, records))
+    write(io, header, records)
 end
 
 ```
