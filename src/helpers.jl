@@ -32,23 +32,6 @@ function _range(records::AbstractVector{Record}; right_open=true)
 end
 
 
-function Base.convert(::Type{Vector{Record}}, chroms::AbstractVector{<:AbstractString}, firsts::AbstractVector{Int}, lasts::AbstractVector{Int}, values::AbstractVector{<:Real})
-
-    len_chroms = length(chroms)
-
-    # Check that arrays are of equal length.
-    len_chroms == length(firsts) && length(lasts) == length(values) && len_chroms == length(values) || error("Vectors are of unequal lengths: chroms=$(length(chroms)), firsts=$(length(firsts)), lasts=$(length(lasts)), values=$(length(values))")
-
-    records = Vector{Record}(undef, len_chroms)
-
-    for (i, chrom, first, last, value) in zip(1:len_chroms, chroms, firsts, lasts, values)
-        records[i] = Record(chrom, first, last, value)
-    end
-
-    return records
-end
-
-
 function compress(chroms::AbstractVector{<:AbstractString}, n::AbstractVector{Int}, values::AbstractVector{<:Real}; right_open = true, bump_back=true)
 
     ranges = Vector{UnitRange{Int}}()
@@ -120,4 +103,4 @@ function expand(records::AbstractVector{Record}; right_open=true, bump_forward=t
 end
 
 expand(chrom::AbstractString, firsts::AbstractVector{Int}, lasts::AbstractVector{Int}, values::AbstractVector{<:Real}; right_open=true, bump_forward=true) = expand(fill(chrom, length(firsts)), firsts, lasts, values, right_open=right_open, bump_forward=bump_forward)
-expand(chroms::AbstractVector{<:AbstractString}, firsts::AbstractVector{Int}, lasts::AbstractVector{Int}, values::Vector{<:Real}; right_open=true, bump_forward=true) = expand( convert(Vector{Record}, chroms, firsts, lasts, values), right_open=right_open, bump_forward=bump_forward)
+expand(chroms::AbstractVector{<:AbstractString}, firsts::AbstractVector{Int}, lasts::AbstractVector{Int}, values::Vector{<:Real}; right_open=true, bump_forward=true) = expand(Record.(chroms, firsts, lasts, values), right_open=right_open, bump_forward=bump_forward)

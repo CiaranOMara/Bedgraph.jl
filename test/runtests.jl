@@ -229,8 +229,6 @@ c1, c2, c3, c4 = Bedgraph._convertCells(Bedgraph._splitLine(Bag.line1))
 @test_throws MethodError convert(Record, String(Bag.line1, " ", "extra_cell")) #TODO: determine difference between MethodError and ErrorException.
 @test_throws ErrorException convert(Record, [Bag.cells1; "extra_cell"])
 
-@test convert(Vector{Record}, Bag.chroms, Bag.firsts, Bag.lasts, Bag.values) == Bag.records
-
 end #testset Conversion
 
 @testset "Internal Helpers" begin
@@ -286,5 +284,9 @@ compressed_records = Bedgraph.compress("chr19", n, expanded_value)
 @test compressed_records == Bag.records
 
 end #testset Utilities
+
+@testset "Deprecated" begin
+	@test (@test_deprecated convert(Vector{Record}, Bag.chroms, Bag.firsts, Bag.lasts, Bag.values)) == Bag.records
+end
 
 end # total testset
