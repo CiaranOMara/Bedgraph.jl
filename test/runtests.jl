@@ -5,9 +5,13 @@ else
     using Test
 end
 
+import Bedgraph.Record
+
 
 module Bag
 using Bedgraph
+import Bedgraph.Record
+
 const chroms = ["chr19", "chr19", "chr19", "chr19", "chr19", "chr19", "chr19", "chr19", "chr19"]
 const firsts = [49302000, 49302300, 49302600, 49302900, 49303200, 49303500, 49303800, 49304100, 49304400]
 const lasts = [49302300, 49302600, 49302900, 49303200, 49303500, 49303800, 49304100, 49304400, 49304700]

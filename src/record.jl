@@ -1,5 +1,3 @@
-export Record
-
 "The bedGraph record."
 struct Record
     chrom::String
