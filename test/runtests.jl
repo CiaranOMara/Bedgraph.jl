@@ -125,38 +125,29 @@ end
 
 end
 
-outputfile = tempname() * ".bedgraph"
-header = Bedgraph.generateBasicHeader(Bag.records)
-
-try
-    open(outputfile, "w") do io
-        write(io, header, Bag.records)
-    end
-    # @test   readstring(Bag.file) ==  readstring(outputfile) # differnces in float representation, but otherwise hold the same information.
-    #TODO: explicitly test that Bag.files hold the same information.
-finally
-    rm(outputfile)
+@test Bag.records == open(Bag.file, "r") do io
+    Bedgraph.seekNextRecord(io)
+    return read(io, Vector{Bedgraph.Record})
 end
 
-outputfile = tempname() * ".bedgraph"
+@test_nowarn mktemp() do path, io
+	header = Bedgraph.generateBasicHeader(Bag.records)
+    write(io, header, Bag.records)
+    # @test   readstring(Bag.file) ==  readstring(outputfile) # differnces in float representation, but otherwise hold the same information.
+    #TODO: explicitly test that Bag.files hold the same information.
+end
 
-try
+@test_nowarn mktemp() do path, io
+	header = Bedgraph.generateBasicHeader("chr19", Bag.records[1].first, Bag.records[end].last, bump_forward=false)
+	write(io, header, Bag.records)
+	# @test   readstring(Bag.file) ==  readstring(outputfile) # differnces in float representation, but otherwise hold the same information.
+	#TODO: explicitly test that Bag.files hold the same information.
+end
+
+@test_nowarn mktempdir() do path
+	outputfile = joinpath(path, "test.bedgraph")
+	header = Bedgraph.generateBasicHeader(Bag.records)
 	write(outputfile, header, Bag.records)
-finally
-    rm(outputfile)
-end
-
-outputfile = tempname() * ".bedgraph"
-
-try
-    open(outputfile, "w") do io
-        header = Bedgraph.generateBasicHeader("chr19", Bag.records[1].first, Bag.records[end].last, bump_forward=false)
-        write(io, header, Bag.records)
-    end
-    # @test   readstring(Bag.file) ==  readstring(outputfile) # differnces in float representation, but otherwise hold the same information.
-    #TODO: explicitly test that Bag.files hold the same information.
-finally
-    rm(outputfile)
 end
 
 end #testset I/O

@@ -1,11 +1,10 @@
 # Bedgraph.jl
 
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
-[![Build Status](https://travis-ci.org/CiaranOMara/Bedgraph.jl.svg?branch=master)](https://travis-ci.org/CiaranOMara/Bedgraph.jl)
+[![Build Status](https://travis-ci.com/CiaranOMara/Bedgraph.jl.svg?branch=master)](https://travis-ci.com/CiaranOMara/Bedgraph.jl)
 [![Build status](https://ci.appveyor.com/api/projects/status/jny2ep4u3cmly8pj/branch/master?svg=true)](https://ci.appveyor.com/project/CiaranOMara/Bedgraph-jl/branch/master)
-[![Bedgraph](http://pkg.julialang.org/badges/Bedgraph_0.6.svg)](http://pkg.julialang.org/?pkg=Bedgraph)
+[![Build Status](https://api.cirrus-ci.com/github/CiaranOMara/Bedgraph.jl.svg?branch=master)](https://cirrus-ci.com/github/CiaranOMara/Bedgraph.jl)
 [![codecov.io](http://codecov.io/github/CiaranOMara/Bedgraph.jl/coverage.svg?branch=master)](http://codecov.io/github/CiaranOMara/Bedgraph.jl?branch=master)
-[![Coverage Status](https://coveralls.io/repos/github/CiaranOMara/Bedgraph.jl/badge.svg?branch=master)](https://coveralls.io/github/CiaranOMara/Bedgraph.jl?branch=master)
 
 > This project will try to follow the [semver](http://semver.org) pro forma.
 
@@ -15,12 +14,14 @@ This package provides read and write support for [Bedgraph files](https://genome
 > **Note:**  this package does not currently handle bedGraph meta data such as the track definition or browser lines.
 
 ## Installation
-Install Bedgraph from the Julia REPL:
+You can install Bedgraph from the [Julia REPL](https://docs.julialang.org/en/v1/manual/getting-started/).
+Press `]` to enter [pkg mode](https://docs.julialang.org/en/v1/stdlib/Pkg/), then enter the following:
+
 ```julia
-using Pkg
-add("Bedgraph")
-#Pkg.add("Bedgraph") for julia prior to v 0.7
+add Bedgraph
 ```
+
+If you are interested in the cutting edge of the development, please check out the [develop branch](https://github.com/CiaranOMara/Bedgraph.jl/tree/develop) to try new features before release.
 
 ## Usage
 
