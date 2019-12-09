@@ -67,6 +67,12 @@ end # module bag
 
 @testset "Bedgraph" begin
 
+@testset "Record Constructor" begin
+	@test_nowarn Record("chr1", 1.0, 1.0, 1.1)
+	@test Record("chr1", 1.0, 1.0, 1.0) == Record("chr1", 1, 1, 1.0)
+	@test Record("chr1", "1.0", "1", "1.1") == Record("chr1", 1, 1, 1.1)
+end
+
 @testset "I/O" begin
 
 @test isfile(Bag.file)
@@ -74,7 +80,7 @@ end # module bag
 
 # Seek test.
 open(Bag.file, "r") do io
-    Bedgraph.seekNextRecord(io)
+    seek(io, Record)
     @test position(io) == 536
     @test readline(io) == Bag.line1
 end
@@ -83,42 +89,47 @@ end
 open(Bag.file_headerless, "r") do io
 
 	# Check that the first record of a headerless bedGraph file can be sought.
-    Bedgraph.seekNextRecord(io)
+    seek(io, Record)
     @test position(io) == 0
     @test readline(io) == Bag.line1 # IO position is at the start of line 2.
 
-	# Check behaviour of consecutive calls to Bedgraph.seekNextRecord(io).
-	Bedgraph.seekNextRecord(io) # Skip to start of line 3.
-	Bedgraph.seekNextRecord(io) # Skip to start of line 4.
-	@test readline(io) == Bag.line4
+	# Check behaviour of consecutive calls to seek(io, Record).
+	seek(io, Record)
+	seek(io, Record)
+	@test readline(io) == Bag.line2
 
 end
 
+open(Bag.file) do io
+	seek(io, Record)
+	@test read!(io, Vector{Bedgraph.Record}(undef, length(Bag.records))) ==  Bag.records
+end
+
+@test_nowarn Bedgraph.BedgraphHeader()
+@test_nowarn Bedgraph.BedgraphHeader{Vector{String}}()
 
 @test read(Bag.file, Vector{Bedgraph.Record}) ==  Bag.records
 @test read(Bag.file, Bedgraph.BedgraphHeader{Vector{String}}).data == Bag.header
 
 
 open(Bag.file, "r") do io # Note: reading records first to check seek.
-    @test Bedgraph.readRecords(io) ==  Bag.records
-	@test Bedgraph._readHeader(io) == Bag.header
+    @test read(io, Vector{Record}) == Bag.records
+	@test read(io, Bedgraph.BedgraphHeader).data == Bag.header
 	@test read(io, Bedgraph.BedgraphHeader{Vector{String}}).data == Bag.header
 end
 
 open(Bag.file_headerless, "r") do io # Note: reading records first to check seek.
-    @test Bedgraph.readRecords(io) == Bag.records
-	@test Bedgraph._readHeader(io) == []
+	@test read(io, Vector{Record}) == Bag.records
+	@test read(io, Bedgraph.BedgraphHeader).data == []
     @test read(io, Bedgraph.BedgraphHeader{Vector{String}}).data == []
 end
 
-@test  Bag.records == open(Bag.file, "r") do io
+@test Bag.records == open(Bag.file, "r") do io
 	records = Vector{Record}()
 
-    while !eof(io)
-        record = Bedgraph.readRecord(io)
-        if record != nothing
-            push!(records, record)
-        end
+	while !eof(seek(io, Bedgraph.Record))
+        record = read(io, Bedgraph.Record) #Note: no protection.
+        push!(records, record)
     end
 
     return records
@@ -126,7 +137,7 @@ end
 end
 
 @test Bag.records == open(Bag.file, "r") do io
-    Bedgraph.seekNextRecord(io)
+    seek(io, Bedgraph.Record)
     return read(io, Vector{Bedgraph.Record})
 end
 
@@ -179,15 +190,15 @@ end #testset I/O
 end #testset Matching
 
 
-@testset "Parsing" begin
+@testset "Line Splitting" begin
 
-@test Bedgraph._splitLine(Bag.line1) == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_2) == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_3) == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_4) == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_5) == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_6) == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_7) == Bag.cells1
+@test Bedgraph._splitLine(Bag.line1)[1:4] == Bag.cells1
+@test Bedgraph._splitLine(Bag.line1_2)[1:4] == Bag.cells1
+@test Bedgraph._splitLine(Bag.line1_3)[1:4] == Bag.cells1
+@test Bedgraph._splitLine(Bag.line1_4)[1:4] == Bag.cells1
+@test Bedgraph._splitLine(Bag.line1_5)[1:4] == Bag.cells1
+@test Bedgraph._splitLine(Bag.line1_6)[1:4] == Bag.cells1
+@test Bedgraph._splitLine(Bag.line1_7)[1:4] == Bag.cells1
 
 end #testset Parsing
 
@@ -211,25 +222,10 @@ end #testset Sorting
 
 @testset "Conversion" begin
 
-@test_throws ErrorException Bedgraph._convertCells([Bag.cells1; "extra_cell"]) == Bag.cells1
-
-c1, c2, c3, c4 = Bedgraph._convertCells(Bedgraph._splitLine(Bag.line1))
-
-@test typeof(c1) == String
-@test typeof(c2) <: Int
-@test typeof(c3) <: Int
-@test typeof(c4) <: Real
-
-@test Record(Bag.line1) == Bag.record1
-@test convert(Record, Bag.line1) == Bag.record1
-
-@test Record(Bag.cells1) == Bag.record1
-@test convert(Record, Bag.cells1) == Bag.record1
-
-@test_throws MethodError convert(Record, String(Bag.line1, " ", "extra_cell")) #TODO: determine difference between MethodError and ErrorException.
-@test_throws ErrorException convert(Record, [Bag.cells1; "extra_cell"])
-
-@test convert(Vector{Record}, Bag.chroms, Bag.firsts, Bag.lasts, Bag.values) == Bag.records
+@test Bag.record1 == convert(Record, Bag.line1)
+@test Bag.record1 == Record(Bag.line1)
+@test Bag.record1 == convert(Record, string(Bag.line1, " ", "extra_cell"))
+@test Bag.record1 == Record(string(Bag.line1, " ", "extra_cell"))
 
 end #testset Conversion
 
@@ -286,5 +282,9 @@ compressed_records = Bedgraph.compress("chr19", n, expanded_value)
 @test compressed_records == Bag.records
 
 end #testset Utilities
+
+@testset "Deprecated" begin
+	@test (@test_deprecated convert(Vector{Record}, Bag.chroms, Bag.firsts, Bag.lasts, Bag.values)) == Bag.records
+end
 
 end # total testset

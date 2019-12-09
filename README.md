@@ -47,20 +47,17 @@ records = read(file, Vector{Bedgraph.Record})
 ```julia
 using Bedgraph
 
-records = Vector{Record}()
-open(file, "r") do io
-    records = Bedgraph.readRecords(io)
+records = open(file, "r") do io
+    return read(io, Vector{Bedgraph.Record})
 end
 ```
 
 Alternatively you may want to read and process records individually.
 ```julia
 open(file, "r") do io
-    while !eof(io)
-        record = readRecord(io)
-        if record != nothing
-            # Process record.
-        end
+    while !eof(seek(io, Bedgraph.Record))
+        record = read(io, Bedgraph.Record) #Note: no protection.
+        # Process record.
     end
 end
 ```
@@ -76,7 +73,7 @@ const firsts = [49302000, 49302300, 49302600, 49302900, 49303200, 49303500, 4930
 const lasts = [49302300, 49302600, 49302900, 49303200, 49303500, 49303800, 49304100, 49304400, 49304700]
 const values = [-1.0, -0.75, -0.50, -0.25, 0.0, 0.25, 0.50, 0.75, 1.00]
 
-records = convert(Vector{Bedgraph.Record}, chroms, firsts, lasts, values)
+records = Bedgraph.Record.(chroms, firsts, lasts, values)
 
 sort!(records)
 
@@ -93,7 +90,7 @@ records = [Record("chr19", 49302000, 49302300, -1.0), Record("chr19", 49302300, 
 header = Bedgraph.generateBasicHeader("chr19", records[1].first, records[end].last, bump_forward=false)
 
 open(output_file, "w") do io
-    write(io, header, records))
+    write(io, header, records)
 end
 
 ```

@@ -1,8 +1,17 @@
+"A container for the bedGraph header."
 mutable struct BedgraphHeader{T} #TODO: determine what and how this will be.
     data::T
 end
+BedgraphHeader{T}() where T = BedgraphHeader{T}(T())
+BedgraphHeader() = BedgraphHeader{Vector{String}}()
 
-function Base.convert(::Type{String}, header::BedgraphHeader{Vector{String}}) :: String
+"Push data into [`BedgraphHeader`](@ref) container."
+function Base.push!(sink::BedgraphHeader, data)
+    push!(sink.data, data) #Note: converts data to sink.data's eltype.
+end
+
+"Convert [`BedgraphHeader`](@ref) to type `String`."
+function Base.convert(::Type{String}, header::BedgraphHeader{<:AbstractVector{<:AbstractString}})
 
     str = ""
     for line in header.data
@@ -12,7 +21,8 @@ function Base.convert(::Type{String}, header::BedgraphHeader{Vector{String}}) ::
     return str
 end
 
-function generateBasicHeader(records::Vector{Record}; bump_forward=true) :: BedgraphHeader{Vector{String}} #Note: we assume that records are sorted by chrom and left position.
+"Generate a basic bedGraph header given a vector of [`Record`](@ref)s."
+function generateBasicHeader(records::AbstractVector{Record}; bump_forward=true) #Note: we assume that records are sorted by chrom and left position.
 
     chrom = records[1].chrom
 
@@ -27,26 +37,28 @@ function generateBasicHeader(records::Vector{Record}; bump_forward=true) :: Bedg
     return BedgraphHeader(["browser position $chrom:$pos_start-$pos_end", "track type=bedGraph"])
 end
 
-generateBasicHeader(chrom::String, pos_start::Int, pos_end::Int; bump_forward=true) = generateBasicHeader([Record(chrom, pos_start, pos_end, 0)], bump_forward=bump_forward)
+generateBasicHeader(chrom::AbstractString, pos_start::Int, pos_end::Int; bump_forward=true) = generateBasicHeader([Record(chrom, pos_start, pos_end, 0)], bump_forward=bump_forward)
 
-function _readHeader(io) :: Vector{String}
+"Seek and then read bedGraph header into sink."
+function _readHeader(io::IO, sink)
     position(io) == 0 || seekstart(io)
 
-    header = String[]
     line = readline(io)
 
     while !eof(io) && !isLikeRecord(line) # TODO: seek more rebust check.
-        push!(header, line)
+        push!(sink, line)
         line = readline(io)
     end
 
-    return header
+    return sink
 end
 
-function Base.read(io::IO, ::Type{BedgraphHeader{Vector{String}}}) :: BedgraphHeader{Vector{String} }
-    return BedgraphHeader(_readHeader(io))
+"Read bedGraph header into sink."
+function Base.read(io::IO, sink::Type{<:BedgraphHeader})
+    return _readHeader(io, sink())
 end
 
-function Base.write(io::IO, header::BedgraphHeader{Vector{String}})
+"Write bedGraph header to `IO` as `String`."
+function Base.write(io::IO, header::BedgraphHeader)
     return Base.write(io, convert(String, header))
 end
