@@ -28,11 +28,11 @@ function Base.isless(a::Record, b::Record, chrom_isless::Function=isless) :: Boo
     end
 end
 
-function Record(data::Vector{String})
+function Record(data::AbstractVector{<:AbstractString})
     return convert(Record, data)
 end
 
-function Base.convert(::Type{Record}, data::Vector{String}) :: Record
+function Base.convert(::Type{Record}, data::AbstractVector{<:AbstractString}) :: Record
     chrom, first, last, value = _convertCells(data)
     return Record(chrom, first, last, value)
 end
@@ -41,7 +41,7 @@ function Base.convert(::Type{Vector{String}}, record::Record) :: Vector{String}
     return String[record.chrom, string(record.first), string(record.last), string(record.value)]
 end
 
-function Record(data::String)
+function Record(data::AbstractString)
     return convert(Record, data)
 end
 
@@ -67,11 +67,11 @@ function value(record::Record)::Real
 end
 
 ## Internal helper functions.
-function _splitLine(line::String) ::Vector{String}
+function _splitLine(line::AbstractString) ::Vector{String}
     cells::Vector{String} = filter!(!isempty, split(line, r"\s"))
 end
 
-function _convertCells(cells::Vector{String})
+function _convertCells(cells::AbstractVector{<:AbstractString})
     length(cells) == 4 || error("Poor formatting:", cells)
     return cells[1], parse(Int, cells[2]), parse(Int, cells[3]), parse(Float64, cells[4]) #TODO: parse cell 4 as a generic Real.
 end

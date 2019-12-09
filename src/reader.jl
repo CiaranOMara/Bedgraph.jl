@@ -1,13 +1,13 @@
 # Check if the record data is in the four column BED format.
-function isLikeRecord(line::String) :: Bool
+function isLikeRecord(line::AbstractString) :: Bool
     return  occursin(r"^\s*\S*(?=[A-Za-z0-9])\S*\s+(\d+)\s+(\d+)\s+(\S*\d)\s*$", line) # Note: is like a record.
 end
 
-function isBrowser(line::String) :: Bool
+function isBrowser(line::AbstractString) :: Bool
     return  occursin(r"^browser", lowercase(line))
 end
 
-function isComment(line::String) :: Bool
+function isComment(line::AbstractString) :: Bool
     return occursin(r"^\s*(?:#|$)", line)
 end
 
@@ -73,6 +73,6 @@ function readRecords(io::IO) :: Vector{Record}
 
 end
 
-function Base.read(io::IO, ::Type{Vector{Record}}) :: Vector{Record}
+function Base.read(io::IO, ::Type{<:AbstractVector{Record}}) :: Vector{Record}
     return readRecords(io)
 end

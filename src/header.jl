@@ -2,7 +2,7 @@ mutable struct BedgraphHeader{T} #TODO: determine what and how this will be.
     data::T
 end
 
-function Base.convert(::Type{String}, header::BedgraphHeader{Vector{String}}) :: String
+function Base.convert(::Type{String}, header::BedgraphHeader{<:AbstractVector{<:AbstractString}}) :: String
 
     str = ""
     for line in header.data
@@ -12,7 +12,7 @@ function Base.convert(::Type{String}, header::BedgraphHeader{Vector{String}}) ::
     return str
 end
 
-function generateBasicHeader(records::Vector{Record}; bump_forward=true) :: BedgraphHeader{Vector{String}} #Note: we assume that records are sorted by chrom and left position.
+function generateBasicHeader(records::AbstractVector{Record}; bump_forward=true) :: BedgraphHeader{Vector{String}}#Note: we assume that records are sorted by chrom and left position.
 
     chrom = records[1].chrom
 
@@ -27,7 +27,7 @@ function generateBasicHeader(records::Vector{Record}; bump_forward=true) :: Bedg
     return BedgraphHeader(["browser position $chrom:$pos_start-$pos_end", "track type=bedGraph"])
 end
 
-generateBasicHeader(chrom::String, pos_start::Int, pos_end::Int; bump_forward=true) = generateBasicHeader([Record(chrom, pos_start, pos_end, 0)], bump_forward=bump_forward)
+generateBasicHeader(chrom::AbstractString, pos_start::Int, pos_end::Int; bump_forward=true) = generateBasicHeader([Record(chrom, pos_start, pos_end, 0)], bump_forward=bump_forward)
 
 function _readHeader(io) :: Vector{String}
     position(io) == 0 || seekstart(io)
@@ -43,10 +43,10 @@ function _readHeader(io) :: Vector{String}
     return header
 end
 
-function Base.read(io::IO, ::Type{BedgraphHeader{Vector{String}}}) :: BedgraphHeader{Vector{String} }
+function Base.read(io::IO, ::Type{<:BedgraphHeader}) :: BedgraphHeader{Vector{String} }
     return BedgraphHeader(_readHeader(io))
 end
 
-function Base.write(io::IO, header::BedgraphHeader{Vector{String}})
+function Base.write(io::IO, header::BedgraphHeader)
     return Base.write(io, convert(String, header))
 end

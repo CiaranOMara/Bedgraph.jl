@@ -1,4 +1,4 @@
-function _bump(records::Vector{Record}, b::Int) :: Vector{Record}
+function _bump(records::AbstractVector{Record}, b::Int) :: Vector{Record}
 
     new_records = Vector{Record}(undef, length(records))
 
@@ -10,8 +10,8 @@ function _bump(records::Vector{Record}, b::Int) :: Vector{Record}
     return new_records
 end
 
-_bumpForward(records::Vector{Record}) = _bump(records, 1)
-_bumpBack(records::Vector{Record}) = _bump(records, -1)
+_bumpForward(records::AbstractVector{Record}) = _bump(records, 1)
+_bumpBack(records::AbstractVector{Record}) = _bump(records, -1)
 
 
 function _range(record::Record; right_open=true) :: UnitRange{Int}
@@ -23,7 +23,7 @@ function _range(record::Record; right_open=true) :: UnitRange{Int}
 end
 
 
-function _range(records::Vector{Record}; right_open=true) :: UnitRange{Int}
+function _range(records::AbstractVector{Record}; right_open=true) :: UnitRange{Int}
 
     pos_start = _range(records[1], right_open=right_open)[1]
     pos_end = _range(records[end], right_open=right_open)[end]
@@ -32,7 +32,7 @@ function _range(records::Vector{Record}; right_open=true) :: UnitRange{Int}
 end
 
 
-function Base.convert(::Type{Vector{Record}}, chroms::Vector{String}, firsts::Vector{Int}, lasts::Vector{Int}, values::Vector{T}) where {T<:Real}
+function Base.convert(::Type{Vector{Record}}, chroms::AbstractVector{<:AbstractString}, firsts::AbstractVector{Int}, lasts::AbstractVector{Int}, values::AbstractVector{<:Real})
 
     len_chroms = length(chroms)
 
@@ -49,7 +49,7 @@ function Base.convert(::Type{Vector{Record}}, chroms::Vector{String}, firsts::Ve
 end
 
 
-function compress(chroms::Vector{String}, n::Vector{Int}, values::Vector{<:Real}; right_open = true, bump_back=true) :: Vector{Record}
+function compress(chroms::AbstractVector{<:AbstractString}, n::AbstractVector{Int}, values::AbstractVector{<:Real}; right_open = true, bump_back=true) :: Vector{Record}
 
     ranges = Vector{UnitRange{Int}}()
     compressed_values = Vector{Float64}()
@@ -58,7 +58,7 @@ function compress(chroms::Vector{String}, n::Vector{Int}, values::Vector{<:Real}
     range_start = 1
     push!(compressed_values, values[1])
 
-    for (index, value ) in enumerate(values)
+    for (index, value) in enumerate(values)
         if value != compressed_values[end]
             push!(ranges, n[range_start] : n[index - 1] )
             push!(compressed_values, value)
@@ -95,10 +95,10 @@ function compress(chroms::Vector{String}, n::Vector{Int}, values::Vector{<:Real}
 
 end
 
-compress(chrom::String, n::Vector{Int}, values::Vector{T}; right_open = true, bump_back=true) where {T<:Real} = compress(fill(chrom, length(n)), n, values, right_open = right_open, bump_back = bump_back)
+compress(chrom::AbstractString, n::AbstractVector{Int}, values::AbstractVector{<:Real}; right_open = true, bump_back=true) = compress(fill(chrom, length(n)), n, values, right_open = right_open, bump_back = bump_back)
 
 
-function expand(records::Vector{Record}; right_open=true, bump_forward=true)
+function expand(records::AbstractVector{Record}; right_open=true, bump_forward=true)
 
     #TODO: ensure records are sorted with no overlap.
 
@@ -119,5 +119,5 @@ function expand(records::Vector{Record}; right_open=true, bump_forward=true)
     return collect(total_range), values, chroms
 end
 
-expand(chrom::String, firsts::Vector{Int}, lasts::Vector{Int}, values::Vector{T}; right_open=true, bump_forward=true) where {T<:Real} = expand( fill(chrom, length(firsts)), firsts, lasts, values, right_open=right_open, bump_forward=bump_forward)
-expand(chroms::Vector{String}, firsts::Vector{Int}, lasts::Vector{Int}, values::Vector{T}; right_open=true, bump_forward=true) where {T<:Real} = expand( convert(Vector{Record}, chroms, firsts, lasts, values), right_open=right_open, bump_forward=bump_forward)
+expand(chrom::AbstractString, firsts::AbstractVector{Int}, lasts::AbstractVector{Int}, values::AbstractVector{<:Real}; right_open=true, bump_forward=true) = expand(fill(chrom, length(firsts)), firsts, lasts, values, right_open=right_open, bump_forward=bump_forward)
+expand(chroms::AbstractVector{<:AbstractString}, firsts::AbstractVector{Int}, lasts::AbstractVector{Int}, values::Vector{<:Real}; right_open=true, bump_forward=true) = expand( convert(Vector{Record}, chroms, firsts, lasts, values), right_open=right_open, bump_forward=bump_forward)

@@ -215,7 +215,7 @@ end #testset Sorting
 
 c1, c2, c3, c4 = Bedgraph._convertCells(Bedgraph._splitLine(Bag.line1))
 
-@test typeof(c1) == String
+@test typeof(c1) <: AbstractString
 @test typeof(c2) <: Int
 @test typeof(c3) <: Int
 @test typeof(c4) <: Real
