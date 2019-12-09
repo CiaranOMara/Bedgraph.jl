@@ -15,17 +15,24 @@ function Base.:(==)(a::Record, b::Record)
 end
 
 function Base.isless(a::Record, b::Record, chrom_isless::Function=isless)
-    if a.chrom != b.chrom
-        return chrom_isless(a.chrom, b.chrom) :: Bool
-    elseif a.first != b.first
-        return a.first < b.first
-    elseif a.last != b.last
-        return a.last < b.last
-    elseif a.value != b.value
-        return a.value < b.value
-    else
-        return false
+    if chrom_isless(a.chrom, b.chrom)
+        return true
     end
+
+    if a.first < b.first
+        return true
+    end
+
+    if a.last < b.last
+        return true
+    end
+
+    if a.value < b.value
+        return true
+    end
+
+    return false
+
 end
 
 function Record(data::AbstractVector{<:AbstractString})
