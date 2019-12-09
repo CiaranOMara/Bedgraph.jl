@@ -2,7 +2,7 @@ mutable struct BedgraphHeader{T} #TODO: determine what and how this will be.
     data::T
 end
 
-function Base.convert(::Type{String}, header::BedgraphHeader{<:AbstractVector{<:AbstractString}}) :: String
+function Base.convert(::Type{String}, header::BedgraphHeader{<:AbstractVector{<:AbstractString}})
 
     str = ""
     for line in header.data
@@ -12,7 +12,7 @@ function Base.convert(::Type{String}, header::BedgraphHeader{<:AbstractVector{<:
     return str
 end
 
-function generateBasicHeader(records::AbstractVector{Record}; bump_forward=true) :: BedgraphHeader{Vector{String}}#Note: we assume that records are sorted by chrom and left position.
+function generateBasicHeader(records::AbstractVector{Record}; bump_forward=true) #Note: we assume that records are sorted by chrom and left position.
 
     chrom = records[1].chrom
 
@@ -29,7 +29,7 @@ end
 
 generateBasicHeader(chrom::AbstractString, pos_start::Int, pos_end::Int; bump_forward=true) = generateBasicHeader([Record(chrom, pos_start, pos_end, 0)], bump_forward=bump_forward)
 
-function _readHeader(io) :: Vector{String}
+function _readHeader(io)
     position(io) == 0 || seekstart(io)
 
     header = String[]
@@ -43,7 +43,7 @@ function _readHeader(io) :: Vector{String}
     return header
 end
 
-function Base.read(io::IO, ::Type{<:BedgraphHeader}) :: BedgraphHeader{Vector{String} }
+function Base.read(io::IO, ::Type{<:BedgraphHeader})
     return BedgraphHeader(_readHeader(io))
 end
 

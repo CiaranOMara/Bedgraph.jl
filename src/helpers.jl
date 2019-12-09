@@ -1,4 +1,4 @@
-function _bump(records::AbstractVector{Record}, b::Int) :: Vector{Record}
+function _bump(records::AbstractVector{Record}, b::Int)
 
     new_records = Vector{Record}(undef, length(records))
 
@@ -14,7 +14,7 @@ _bumpForward(records::AbstractVector{Record}) = _bump(records, 1)
 _bumpBack(records::AbstractVector{Record}) = _bump(records, -1)
 
 
-function _range(record::Record; right_open=true) :: UnitRange{Int}
+function _range(record::Record; right_open=true)
 
     pos_start = right_open ? record.first : record.first + 1
     pos_end = right_open ? record.last - 1 : record.last
@@ -23,7 +23,7 @@ function _range(record::Record; right_open=true) :: UnitRange{Int}
 end
 
 
-function _range(records::AbstractVector{Record}; right_open=true) :: UnitRange{Int}
+function _range(records::AbstractVector{Record}; right_open=true)
 
     pos_start = _range(records[1], right_open=right_open)[1]
     pos_end = _range(records[end], right_open=right_open)[end]
@@ -49,7 +49,7 @@ function Base.convert(::Type{Vector{Record}}, chroms::AbstractVector{<:AbstractS
 end
 
 
-function compress(chroms::AbstractVector{<:AbstractString}, n::AbstractVector{Int}, values::AbstractVector{<:Real}; right_open = true, bump_back=true) :: Vector{Record}
+function compress(chroms::AbstractVector{<:AbstractString}, n::AbstractVector{Int}, values::AbstractVector{<:Real}; right_open = true, bump_back=true)
 
     ranges = Vector{UnitRange{Int}}()
     compressed_values = Vector{Float64}()

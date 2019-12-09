@@ -14,7 +14,7 @@ function Base.:(==)(a::Record, b::Record)
            a.value == b.value
 end
 
-function Base.isless(a::Record, b::Record, chrom_isless::Function=isless) :: Bool
+function Base.isless(a::Record, b::Record, chrom_isless::Function=isless)
     if a.chrom != b.chrom
         return chrom_isless(a.chrom, b.chrom) :: Bool
     elseif a.first != b.first
@@ -32,12 +32,12 @@ function Record(data::AbstractVector{<:AbstractString})
     return convert(Record, data)
 end
 
-function Base.convert(::Type{Record}, data::AbstractVector{<:AbstractString}) :: Record
+function Base.convert(::Type{Record}, data::AbstractVector{<:AbstractString})
     chrom, first, last, value = _convertCells(data)
     return Record(chrom, first, last, value)
 end
 
-function Base.convert(::Type{Vector{String}}, record::Record) :: Vector{String}
+function Base.convert(::Type{Vector{String}}, record::Record)
     return String[record.chrom, string(record.first), string(record.last), string(record.value)]
 end
 
@@ -50,24 +50,24 @@ function Base.convert(::Type{Record}, str::AbstractString)
     return convert(Record, data)
 end
 
-function chrom(record::Record)::String
+function chrom(record::Record)
     return record.chrom
 end
 
-function Base.first(record::Record)::Int
+function Base.first(record::Record)
     return record.first
 end
 
-function Base.last(record::Record)::Int
+function Base.last(record::Record)
     return record.last
 end
 
-function value(record::Record)::Real
+function value(record::Record)
     return record.value
 end
 
 ## Internal helper functions.
-function _splitLine(line::AbstractString) ::Vector{String}
+function _splitLine(line::AbstractString)
     cells::Vector{String} = filter!(!isempty, split(line, r"\s"))
 end
 

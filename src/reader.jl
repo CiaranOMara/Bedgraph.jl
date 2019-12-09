@@ -1,18 +1,18 @@
 # Check if the record data is in the four column BED format.
-function isLikeRecord(line::AbstractString) :: Bool
+function isLikeRecord(line::AbstractString)
     return  occursin(r"^\s*\S*(?=[A-Za-z0-9])\S*\s+(\d+)\s+(\d+)\s+(\S*\d)\s*$", line) # Note: is like a record.
 end
 
-function isBrowser(line::AbstractString) :: Bool
+function isBrowser(line::AbstractString)
     return  occursin(r"^browser", lowercase(line))
 end
 
-function isComment(line::AbstractString) :: Bool
+function isComment(line::AbstractString)
     return occursin(r"^\s*(?:#|$)", line)
 end
 
 
-function seekNextRecord(io::IO) :: Nothing
+function seekNextRecord(io::IO)
 
     pos = position(io)
     initial = pos == 0 ? -1 : pos # Note: Allows for the fist line of headerless bedGraph file to be read.
@@ -30,7 +30,7 @@ function seekNextRecord(io::IO) :: Nothing
 end
 
 # Note: all options are placed in a single line separated by spaces.
-function readParameters(io::IO) :: String
+function readParameters(io::IO)
     seekstart(io)
 
     pos = position(io)
@@ -56,7 +56,7 @@ function readRecord(io::IO) :: Union{Nothing, Record}
     return nothing
 end
 
-function readRecords(io::IO) :: Vector{Record}
+function readRecords(io::IO)
     seekstart(io)
     seekNextRecord(io)
 
@@ -73,6 +73,6 @@ function readRecords(io::IO) :: Vector{Record}
 
 end
 
-function Base.read(io::IO, ::Type{<:AbstractVector{Record}}) :: Vector{Record}
+function Base.read(io::IO, ::Type{<:AbstractVector{Record}})
     return readRecords(io)
 end
