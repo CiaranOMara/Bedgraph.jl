@@ -211,7 +211,7 @@ end #testset Sorting
 
 @testset "Conversion" begin
 
-@test_throws ErrorException Bedgraph._convertCells([Bag.cells1; "extra_cell"]) == Bag.cells1
+@test_nowarn Bedgraph._convertCells([Bag.cells1; "extra_cell"]) == Bag.cells1
 
 c1, c2, c3, c4 = Bedgraph._convertCells(Bedgraph._splitLine(Bag.line1))
 
@@ -226,8 +226,8 @@ c1, c2, c3, c4 = Bedgraph._convertCells(Bedgraph._splitLine(Bag.line1))
 @test Record(Bag.cells1) == Bag.record1
 @test convert(Record, Bag.cells1) == Bag.record1
 
-@test_throws MethodError convert(Record, String(Bag.line1, " ", "extra_cell")) #TODO: determine difference between MethodError and ErrorException.
-@test_throws ErrorException convert(Record, [Bag.cells1; "extra_cell"])
+@test_nowarn convert(Record, string(Bag.line1, " ", "extra_cell")) #TODO: determine difference between MethodError and ErrorException.
+@test_nowarn convert(Record, [Bag.cells1; "extra_cell"])
 
 end #testset Conversion
 

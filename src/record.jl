@@ -75,10 +75,9 @@ end
 
 ## Internal helper functions.
 function _splitLine(line::AbstractString)
-    cells::Vector{String} = filter!(!isempty, split(line, r"\s"))
+    return filter(!isempty, split(line, r"\s"))[1:4]
 end
 
 function _convertCells(cells::AbstractVector{<:AbstractString})
-    length(cells) == 4 || error("Poor formatting:", cells)
     return cells[1], parse(Int, cells[2]), parse(Int, cells[3]), parse(Float64, cells[4]) #TODO: parse cell 4 as a generic Real.
 end
