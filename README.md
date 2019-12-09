@@ -77,7 +77,7 @@ records = Bedgraph.Record.(chroms, firsts, lasts, values)
 
 sort!(records)
 
-header = Bedgraph.generateBasicHeader(records)
+header = Bedgraph.generate_basic_header(records)
 
 write("data.bedgraph", header, records)
 ```
@@ -87,7 +87,7 @@ write("data.bedgraph", header, records)
 using Bedgraph
 
 records = [Record("chr19", 49302000, 49302300, -1.0), Record("chr19", 49302300, 49302600, -1.75)]
-header = Bedgraph.generateBasicHeader("chr19", records[1].first, records[end].last, bump_forward=false)
+header = Bedgraph.generate_basic_header("chr19", records[1].first, records[end].last, bump_forward=false)
 
 open(output_file, "w") do io
     write(io, header, records)

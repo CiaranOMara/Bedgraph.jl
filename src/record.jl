@@ -68,7 +68,7 @@ function Record(data::AbstractString)
 end
 
 function Base.convert(::Type{Record}, str::AbstractString)
-    data = _splitLine(str)
+    data = _split_line(str)
     return Record(data[1], data[2], data[3], data[4])
 end
 
@@ -93,6 +93,6 @@ function value(record::Record)
 end
 
 ## Internal helper functions.
-function _splitLine(line::AbstractString)
+function _split_line(line::AbstractString)
     return split(line, r"\s", limit=5, keepempty=false) #Note: may return 5 elements.
 end

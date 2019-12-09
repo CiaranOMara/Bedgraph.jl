@@ -10,8 +10,8 @@ function _bump(records::AbstractVector{Record}, b::Int)
     return new_records
 end
 
-_bumpForward(records::AbstractVector{Record}) = _bump(records, 1)
-_bumpBack(records::AbstractVector{Record}) = _bump(records, -1)
+_bump_forward(records::AbstractVector{Record}) = _bump(records, 1)
+_bump_back(records::AbstractVector{Record}) = _bump(records, -1)
 
 
 function _range(record::Record; right_open=true)
@@ -74,7 +74,7 @@ function compress(chroms::AbstractVector{<:AbstractString}, n::AbstractVector{In
         new_records[index]  = Record(chrom, first(range), last(range), value)
     end
 
-    return bump_back ? _bumpBack(new_records) : new_records
+    return bump_back ? _bump_back(new_records) : new_records
 
 end
 
@@ -86,7 +86,7 @@ function expand(records::AbstractVector{Record}; right_open=true, bump_forward=t
     #TODO: ensure records are sorted with no overlap.
 
     if bump_forward
-        records =  _bumpForward(records)
+        records =  _bump_forward(records)
     end
 
     total_range =_range(records, right_open = right_open)

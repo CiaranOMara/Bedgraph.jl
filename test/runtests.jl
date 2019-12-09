@@ -142,7 +142,7 @@ end
 end
 
 @test_nowarn mktemp() do path, io
-	header = Bedgraph.generateBasicHeader(Bag.records)
+	header = Bedgraph.generate_basic_header(Bag.records)
     write(io, header, Bag.records)
 
 	seekstart(io)
@@ -161,7 +161,7 @@ end
 # end
 
 @test_nowarn mktemp() do path, io
-	header = Bedgraph.generateBasicHeader("chr19", Bag.records[1].first, Bag.records[end].last, bump_forward=false)
+	header = Bedgraph.generate_basic_header("chr19", Bag.records[1].first, Bag.records[end].last, bump_forward=false)
 	write(io, header, Bag.records)
 
 	seekstart(io)
@@ -170,7 +170,7 @@ end
 
 @test_nowarn mktempdir() do path
 	outputfile = joinpath(path, "test.bedgraph")
-	header = Bedgraph.generateBasicHeader(Bag.records)
+	header = Bedgraph.generate_basic_header(Bag.records)
 	write(outputfile, header, Bag.records)
 
 	@test Bag.records == read(outputfile, Vector{Record})
@@ -181,39 +181,39 @@ end #testset I/O
 
 @testset "Matching" begin
 
-@test Bedgraph.isComment(Bag.comment1)
-@test Bedgraph.isBrowser(Bag.browser3)
+@test Bedgraph.is_comment(Bag.comment1)
+@test Bedgraph.is_browser(Bag.browser3)
 
-@test Bedgraph.isLikeRecord("1 2 3 4") == true
-@test Bedgraph.isLikeRecord(Bag.parameter_line) == false
-@test Bedgraph.isLikeRecord(Bag.parameter_line_4) == false
-@test Bedgraph.isLikeRecord(Bag.parameter_line_min) == false
-@test Bedgraph.isLikeRecord(Bag.parameter_line_long) == false
-@test Bedgraph.isLikeRecord(Bag.line1) == true
-@test Bedgraph.isLikeRecord(Bag.line1_2) == true
-@test Bedgraph.isLikeRecord(Bag.line1_3) == true
-@test Bedgraph.isLikeRecord(Bag.line1_4) == true
-@test Bedgraph.isLikeRecord(Bag.line1_5) == true
-@test Bedgraph.isLikeRecord(Bag.line1_6) == true
-@test Bedgraph.isLikeRecord(Bag.line1_7) == true
+@test Bedgraph.is_like_record("1 2 3 4") == true
+@test Bedgraph.is_like_record(Bag.parameter_line) == false
+@test Bedgraph.is_like_record(Bag.parameter_line_4) == false
+@test Bedgraph.is_like_record(Bag.parameter_line_min) == false
+@test Bedgraph.is_like_record(Bag.parameter_line_long) == false
+@test Bedgraph.is_like_record(Bag.line1) == true
+@test Bedgraph.is_like_record(Bag.line1_2) == true
+@test Bedgraph.is_like_record(Bag.line1_3) == true
+@test Bedgraph.is_like_record(Bag.line1_4) == true
+@test Bedgraph.is_like_record(Bag.line1_5) == true
+@test Bedgraph.is_like_record(Bag.line1_6) == true
+@test Bedgraph.is_like_record(Bag.line1_7) == true
 
 
-@test Bedgraph.isLikeRecord(Bag.line_other_space) == true
-@test Bedgraph.isLikeRecord(Bag.line_other) == true
-@test Bedgraph.isLikeRecord(Bag.line_other_chrom) == true
+@test Bedgraph.is_like_record(Bag.line_other_space) == true
+@test Bedgraph.is_like_record(Bag.line_other) == true
+@test Bedgraph.is_like_record(Bag.line_other_chrom) == true
 
 end #testset Matching
 
 
 @testset "Line Splitting" begin
 
-@test Bedgraph._splitLine(Bag.line1)[1:4] == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_2)[1:4] == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_3)[1:4] == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_4)[1:4] == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_5)[1:4] == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_6)[1:4] == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_7)[1:4] == Bag.cells1
+@test Bedgraph._split_line(Bag.line1)[1:4] == Bag.cells1
+@test Bedgraph._split_line(Bag.line1_2)[1:4] == Bag.cells1
+@test Bedgraph._split_line(Bag.line1_3)[1:4] == Bag.cells1
+@test Bedgraph._split_line(Bag.line1_4)[1:4] == Bag.cells1
+@test Bedgraph._split_line(Bag.line1_5)[1:4] == Bag.cells1
+@test Bedgraph._split_line(Bag.line1_6)[1:4] == Bag.cells1
+@test Bedgraph._split_line(Bag.line1_7)[1:4] == Bag.cells1
 
 end #testset Parsing
 
@@ -253,11 +253,11 @@ end #testset Conversion
 @test Bedgraph._range(Bag.records, right_open=false) == Bag.record1.first + 1 : Record(Bag.line9).last
 
 
-bumped_records = Bedgraph._bumpForward(Bag.records)
+bumped_records = Bedgraph._bump_forward(Bag.records)
 @test bumped_records[1].first == (Bag.records[1].first + 1)
 @test bumped_records[1].last == (Bag.records[1].last + 1)
 
-bumped_records = Bedgraph._bumpBack(Bag.records)
+bumped_records = Bedgraph._bump_back(Bag.records)
 @test bumped_records[1].first == (Bag.records[1].first - 1)
 @test bumped_records[1].last == (Bag.records[1].last - 1)
 
