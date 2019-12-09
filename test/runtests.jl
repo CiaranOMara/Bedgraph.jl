@@ -179,15 +179,15 @@ end #testset I/O
 end #testset Matching
 
 
-@testset "Parsing" begin
+@testset "Line Splitting" begin
 
-@test Bedgraph._splitLine(Bag.line1) == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_2) == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_3) == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_4) == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_5) == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_6) == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_7) == Bag.cells1
+@test Bedgraph._splitLine(Bag.line1)[1:4] == Bag.cells1
+@test Bedgraph._splitLine(Bag.line1_2)[1:4] == Bag.cells1
+@test Bedgraph._splitLine(Bag.line1_3)[1:4] == Bag.cells1
+@test Bedgraph._splitLine(Bag.line1_4)[1:4] == Bag.cells1
+@test Bedgraph._splitLine(Bag.line1_5)[1:4] == Bag.cells1
+@test Bedgraph._splitLine(Bag.line1_6)[1:4] == Bag.cells1
+@test Bedgraph._splitLine(Bag.line1_7)[1:4] == Bag.cells1
 
 end #testset Parsing
 

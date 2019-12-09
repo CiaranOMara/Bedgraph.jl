@@ -75,7 +75,7 @@ end
 
 ## Internal helper functions.
 function _splitLine(line::AbstractString)
-    return filter(!isempty, split(line, r"\s"))[1:4]
+    return split(line, r"\s", limit=5, keepempty=false) #Note: may return 5 elements.
 end
 
 function _convertCells(cells::AbstractVector{<:AbstractString})
