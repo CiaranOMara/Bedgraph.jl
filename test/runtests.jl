@@ -144,21 +144,25 @@ end
 @test_nowarn mktemp() do path, io
 	header = Bedgraph.generateBasicHeader(Bag.records)
     write(io, header, Bag.records)
-    # @test   readstring(Bag.file) ==  readstring(outputfile) # differnces in float representation, but otherwise hold the same information.
-    #TODO: explicitly test that Bag.files hold the same information.
+
+	seekstart(io)
+	@test Bag.records == read(io, Vector{Record})
 end
 
 @test_nowarn mktemp() do path, io
 	header = Bedgraph.generateBasicHeader("chr19", Bag.records[1].first, Bag.records[end].last, bump_forward=false)
 	write(io, header, Bag.records)
-	# @test   readstring(Bag.file) ==  readstring(outputfile) # differnces in float representation, but otherwise hold the same information.
-	#TODO: explicitly test that Bag.files hold the same information.
+
+	seekstart(io)
+	@test Bag.records == read(io, Vector{Record})
 end
 
 @test_nowarn mktempdir() do path
 	outputfile = joinpath(path, "test.bedgraph")
 	header = Bedgraph.generateBasicHeader(Bag.records)
 	write(outputfile, header, Bag.records)
+
+	@test Bag.records == read(outputfile, Vector{Record})
 end
 
 end #testset I/O
