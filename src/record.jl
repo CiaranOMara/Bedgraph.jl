@@ -74,6 +74,11 @@ function Base.convert(::Type{Record}, str::AbstractString)
     return Record(data[1], data[2], data[3], data[4])
 end
 
+function Base.convert(::Type{Record{T}}, str::AbstractString) where T
+    data = _split_line(str)
+    return Record{T}(data[1], data[2], data[3], data[4])
+end
+
 "Access [`Record`](@ref)'s chrom field."
 function chrom(record::Record)
     return record.chrom
