@@ -153,6 +153,14 @@ end
 	@test Bag.records == read(io, Vector{Record})
 end
 
+@test_nowarn mktemp() do path, io
+	header = Bedgraph.generate_basic_header(Bag.records)
+    write(io, header, Bag.records)
+
+	seekstart(io)
+	@test Bag.records == read(io, Vector{Record{Float64}})
+end
+
 # Not able to capture write(::IO, ::AbstractVector).
 # @test_nowarn mktemp() do path, io
 # 	# test AbstractVector

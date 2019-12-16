@@ -32,7 +32,7 @@ function seek_next_record(io::IO)
 end
 
 "Seek position of next [`Record`](@ref)."
-function Base.seek(io::IO, ::Type{Record})
+function Base.seek(io::IO, ::Type{<:Record})
     return seek_next_record(io)
 end
 
@@ -64,7 +64,7 @@ function read_record(io::IO) :: Union{Nothing, Record}
 end
 
 "Read string into type's constructor."
-function Base.read(io::IO, obj::Type{Record})
+function Base.read(io::IO, obj::Type{<:Record})
     line = readline(io)
     return obj(line)
 end
@@ -84,6 +84,6 @@ end
 read_records(io::IO, sink::Type) = read_records(io::IO, sink())
 read_records(io::IO) = read_records(io::IO, Vector{Record})
 
-function Base.read(io::IO, ::Type{T}) where {T<:AbstractVector{Record}}
+function Base.read(io::IO, ::Type{T}) where {T<:AbstractVector{<:Record}}
     return read_records(io, T)
 end

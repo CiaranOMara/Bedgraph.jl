@@ -1,9 +1,9 @@
-function _bump(records::AbstractVector{<:Record}, b::Int)
+function _bump(records::AbstractVector{R}, b::Int) where {T, R<:Record{T}}
 
-    new_records = Vector{Record}(undef, length(records))
+    new_records = Vector{R}(undef, length(records))
 
     for (i, record) in enumerate(records)
-        new_record  = Record(record.chrom, record.first + b, record.last + b, record.value)
+        new_record  = Record{T}(record.chrom, record.first + b, record.last + b, record.value)
         new_records[i] = new_record
     end
 
@@ -32,10 +32,10 @@ function _range(records::AbstractVector{<:Record}; right_open=true)
 end
 
 
-function compress(chroms::AbstractVector{<:AbstractString}, n::AbstractVector{Int}, values::AbstractVector{<:Real}; right_open = true, bump_back=true)
+function compress(chroms::AbstractVector{<:AbstractString}, n::AbstractVector{Int}, values::AbstractVector{T}; right_open = true, bump_back=true) where {T<:Real}
 
     ranges = Vector{UnitRange{Int}}()
-    compressed_values = Vector{Float64}()
+    compressed_values = Vector{T}()
     compressed_chroms = Vector{String}()
 
     range_start = 1
@@ -68,10 +68,10 @@ function compress(chroms::AbstractVector{<:AbstractString}, n::AbstractVector{In
 
     len = length(ranges)
 
-    new_records = Vector{Record}(undef, len)
+    new_records = Vector{Record{T}}(undef, len)
 
     for (index, chrom, range, value) in zip(1:len, compressed_chroms, ranges, compressed_values)
-        new_records[index]  = Record(chrom, first(range), last(range), value)
+        new_records[index]  = Record{T}(chrom, first(range), last(range), value)
     end
 
     return bump_back ? _bump_back(new_records) : new_records
@@ -81,7 +81,7 @@ end
 compress(chrom::AbstractString, n::AbstractVector{Int}, values::AbstractVector{<:Real}; right_open = true, bump_back=true) = compress(fill(chrom, length(n)), n, values, right_open = right_open, bump_back = bump_back)
 
 
-function expand(records::AbstractVector{<:Record}; right_open=true, bump_forward=true)
+function expand(records::AbstractVector{R}; right_open=true, bump_forward=true) where {T, R<:Record{T}}
 
     #TODO: ensure records are sorted with no overlap.
 
@@ -91,7 +91,7 @@ function expand(records::AbstractVector{<:Record}; right_open=true, bump_forward
 
     total_range =_range(records, right_open = right_open)
 
-    values = Vector{Float64}(undef, length(total_range))
+    values = Vector{T}(undef, length(total_range))
     chroms = Vector{String}(undef, length(total_range))
 
     for record in records
