@@ -5,6 +5,7 @@ struct Record{T<:Real}
     last::Int
     value::T
 
+    Record{T}(chrom::String, first::Int, last::Int, value::T) where {T} = new{T}(chrom, first, last, value)
     Record{T}(chrom, first, last, value) where {T} = new{T}(_string(chrom), _int(first), _int(last), _real(value))
 
 end
