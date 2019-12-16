@@ -22,7 +22,7 @@ function Base.convert(::Type{String}, header::BedgraphHeader{<:AbstractVector{<:
 end
 
 "Generate a basic bedGraph header given a vector of [`Record`](@ref)s."
-function generate_basic_header(records::AbstractVector{Record}; bump_forward=true) #Note: we assume that records are sorted by chrom and left position.
+function generate_basic_header(records::AbstractVector{<:Record}; bump_forward=true) #Note: we assume that records are sorted by chrom and left position.
 
     chrom = records[1].chrom
 

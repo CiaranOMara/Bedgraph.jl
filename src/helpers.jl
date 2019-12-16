@@ -1,4 +1,4 @@
-function _bump(records::AbstractVector{Record}, b::Int)
+function _bump(records::AbstractVector{<:Record}, b::Int)
 
     new_records = Vector{Record}(undef, length(records))
 
@@ -10,8 +10,8 @@ function _bump(records::AbstractVector{Record}, b::Int)
     return new_records
 end
 
-_bump_forward(records::AbstractVector{Record}) = _bump(records, 1)
-_bump_back(records::AbstractVector{Record}) = _bump(records, -1)
+_bump_forward(records::AbstractVector{<:Record}) = _bump(records, 1)
+_bump_back(records::AbstractVector{<:Record}) = _bump(records, -1)
 
 
 function _range(record::Record; right_open=true)
@@ -23,7 +23,7 @@ function _range(record::Record; right_open=true)
 end
 
 
-function _range(records::AbstractVector{Record}; right_open=true)
+function _range(records::AbstractVector{<:Record}; right_open=true)
 
     pos_start = _range(records[1], right_open=right_open)[1]
     pos_end = _range(records[end], right_open=right_open)[end]
@@ -81,7 +81,7 @@ end
 compress(chrom::AbstractString, n::AbstractVector{Int}, values::AbstractVector{<:Real}; right_open = true, bump_back=true) = compress(fill(chrom, length(n)), n, values, right_open = right_open, bump_back = bump_back)
 
 
-function expand(records::AbstractVector{Record}; right_open=true, bump_forward=true)
+function expand(records::AbstractVector{<:Record}; right_open=true, bump_forward=true)
 
     #TODO: ensure records are sorted with no overlap.
 

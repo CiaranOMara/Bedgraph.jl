@@ -1,11 +1,15 @@
 "The bedGraph record."
-struct Record
+struct Record{T<:Real}
     chrom::String
     first::Int
     last::Int
-    value::Real
+    value::T
 
-    Record(chrom, first, last, value) = new(_string(chrom), _int(first), _int(last), _real(value))
+end
+
+function Record(chrom, first, last, value)
+    v = _real(value)
+    return Record{typeof(v)}(_string(chrom), _int(first), _int(last), v)
 end
 
 function _int(pos)
