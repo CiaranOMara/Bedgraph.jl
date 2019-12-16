@@ -66,14 +66,14 @@ end
 "Read string into type's constructor."
 function Base.read(io::IO, obj::Type{<:Record})
     line = readline(io)
-    return obj(line)
+    return convert(obj, line)
 end
 
-function read_records(io::IO, sink)
+function read_records(io::IO, sink, el::Type=Record)
     seekstart(io)
 
-    while !eof(seek(io, Record))
-        record = read(io, Record)
+    while !eof(seek(io, Record))#TODO: consider using el in seek.
+        record = read(io, el)
         push!(sink, record) #Note: converts Record to sink's eltype.
     end
 
@@ -81,9 +81,8 @@ function read_records(io::IO, sink)
 
 end
 
-read_records(io::IO, sink::Type) = read_records(io::IO, sink())
-read_records(io::IO) = read_records(io::IO, Vector{Record})
+read_records(io::IO, sink::Type=Vector{Record}, el::Type=Record) = read_records(io::IO, sink(), el)
 
-function Base.read(io::IO, ::Type{T}) where {T<:AbstractVector{<:Record}}
-    return read_records(io, T)
+function Base.read(io::IO, ::Type{V}) where {R<:Record, V<:AbstractVector{R}}
+    return read_records(io, V, R)
 end

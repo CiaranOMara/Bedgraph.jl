@@ -153,6 +153,16 @@ end
 	@test Bag.records == read(io, Vector{Record})
 end
 
+
+@test Record{Int} <: Record
+
+@test_nowarn mktemp() do path, io
+    write(io, Bag.records[[1,5,9]])
+
+	seekstart(io)
+	@test Bag.records[[1,5,9]] == read(io, Vector{Record{Int}})
+end
+
 @test_nowarn mktemp() do path, io
 	header = Bedgraph.generate_basic_header(Bag.records)
     write(io, header, Bag.records)

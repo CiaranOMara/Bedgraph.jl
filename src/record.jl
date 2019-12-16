@@ -5,11 +5,13 @@ struct Record{T<:Real}
     last::Int
     value::T
 
+    Record{T}(chrom, first, last, value) where {T} = new{T}(_string(chrom), _int(first), _int(last), _real(value))
+
 end
 
 function Record(chrom, first, last, value)
     v = _real(value)
-    return Record{typeof(v)}(_string(chrom), _int(first), _int(last), v)
+    return Record{typeof(v)}(chrom, first, last, v)
 end
 
 function _int(pos)
