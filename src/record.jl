@@ -7,7 +7,6 @@ struct Record{T<:Real}
 
     Record{T}(chrom::String, first::Int, last::Int, value::T) where {T} = new{T}(chrom, first, last, value)
     Record{T}(chrom, first, last, value) where {T} = new{T}(_string(chrom), _int(first), _int(last), _real(value))
-
 end
 
 function Record(chrom, first, last, value)
@@ -37,13 +36,14 @@ end
 
 
 function Base.:(==)(a::Record, b::Record)
-    return a.chrom  == b.chrom &&
+    return a.chrom == b.chrom &&
            a.first == b.first &&
-           a.last == b.last &&
+           a.last  == b.last &&
            a.value == b.value
 end
 
 function Base.isless(a::Record, b::Record, chrom_isless::Function=isless)
+
     if chrom_isless(a.chrom, b.chrom)
         return true
     end
@@ -61,7 +61,6 @@ function Base.isless(a::Record, b::Record, chrom_isless::Function=isless)
     end
 
     return false
-
 end
 
 function Base.convert(::Type{Vector{String}}, record::Record)
