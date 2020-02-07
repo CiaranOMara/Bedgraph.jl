@@ -5,9 +5,13 @@ else
     using Test
 end
 
+import Bedgraph.Record
+
 
 module Bag
 using Bedgraph
+import Bedgraph.Record
+
 const chroms = ["chr19", "chr19", "chr19", "chr19", "chr19", "chr19", "chr19", "chr19", "chr19"]
 const firsts = [49302000, 49302300, 49302600, 49302900, 49303200, 49303500, 49303800, 49304100, 49304400]
 const lasts = [49302300, 49302600, 49302900, 49303200, 49303500, 49303800, 49304100, 49304400, 49304700]
@@ -75,231 +79,243 @@ end
 
 @testset "I/O" begin
 
-@test isfile(Bag.file)
-@test isfile(Bag.file_headerless)
+	@test isfile(Bag.file)
+	@test isfile(Bag.file_headerless)
 
-# Seek test.
-open(Bag.file, "r") do io
-    seek(io, Record)
-    @test position(io) == 536
-    @test readline(io) == Bag.line1
-end
+	# Seek test.
+	open(Bag.file, "r") do io
+	    seek(io, Record)
+	    @test position(io) == 536
+	    @test readline(io) == Bag.line1
+	end
 
-# Check things for headerless Bag.files.
-open(Bag.file_headerless, "r") do io
+	# Check things for headerless Bag.files.
+	open(Bag.file_headerless, "r") do io
 
-	# Check that the first record of a headerless bedGraph file can be sought.
-    seek(io, Record)
-    @test position(io) == 0
-    @test readline(io) == Bag.line1 # IO position is at the start of line 2.
+		# Check that the first record of a headerless bedGraph file can be sought.
+	    seek(io, Record)
+	    @test position(io) == 0
+	    @test readline(io) == Bag.line1 # IO position is at the start of line 2.
 
-	# Check behaviour of consecutive calls to seek(io, Record).
-	seek(io, Record)
-	seek(io, Record)
-	@test readline(io) == Bag.line2
+		# Check behaviour of consecutive calls to seek(io, Record).
+		seek(io, Record)
+		seek(io, Record)
+		@test readline(io) == Bag.line2
 
-end
+	end
 
-open(Bag.file) do io
-	seek(io, Record)
-	@test read!(io, Vector{Bedgraph.Record}(undef, length(Bag.records))) ==  Bag.records
-end
+	open(Bag.file) do io
+		seek(io, Record)
+		@test read!(io, Vector{Bedgraph.Record}(undef, length(Bag.records))) ==  Bag.records
+	end
 
-@test_nowarn Bedgraph.BedgraphHeader()
-@test_nowarn Bedgraph.BedgraphHeader{Vector{String}}()
+	@test_nowarn Bedgraph.BedgraphHeader()
+	@test_nowarn Bedgraph.BedgraphHeader{Vector{String}}()
 
-@test read(Bag.file, Vector{Bedgraph.Record}) ==  Bag.records
-@test read(Bag.file, Bedgraph.BedgraphHeader{Vector{String}}).data == Bag.header
+	@test read(Bag.file, Vector{Bedgraph.Record}) ==  Bag.records
+	@test read(Bag.file, Bedgraph.BedgraphHeader{Vector{String}}).data == Bag.header
 
 
-open(Bag.file, "r") do io # Note: reading records first to check seek.
-    @test read(io, Vector{Record}) == Bag.records
-	@test read(io, Bedgraph.BedgraphHeader).data == Bag.header
-	@test read(io, Bedgraph.BedgraphHeader{Vector{String}}).data == Bag.header
-end
+	open(Bag.file, "r") do io # Note: reading records first to check seek.
+	    @test read(io, Vector{Record}) == Bag.records
+		@test read(io, Bedgraph.BedgraphHeader).data == Bag.header
+		@test read(io, Bedgraph.BedgraphHeader{Vector{String}}).data == Bag.header
+	end
 
-open(Bag.file_headerless, "r") do io # Note: reading records first to check seek.
-	@test read(io, Vector{Record}) == Bag.records
-	@test read(io, Bedgraph.BedgraphHeader).data == []
-    @test read(io, Bedgraph.BedgraphHeader{Vector{String}}).data == []
-end
+	open(Bag.file_headerless, "r") do io # Note: reading records first to check seek.
+		@test read(io, Vector{Record}) == Bag.records
+		@test read(io, Bedgraph.BedgraphHeader).data == []
+	    @test read(io, Bedgraph.BedgraphHeader{Vector{String}}).data == []
+	end
 
-@test Bag.records == open(Bag.file, "r") do io
-	records = Vector{Record}()
+	@test Bag.records == open(Bag.file, "r") do io
+		records = Vector{Record}()
 
-	while !eof(seek(io, Bedgraph.Record))
-        record = read(io, Bedgraph.Record) #Note: no protection.
-        push!(records, record)
-    end
+		while !eof(seek(io, Bedgraph.Record))
+	        record = read(io, Bedgraph.Record) #Note: no protection.
+	        push!(records, record)
+	    end
 
-    return records
+	    return records
+	end
 
-end
+	@test Bag.records == open(Bag.file, "r") do io
+	    seek(io, Bedgraph.Record)
+	    return read(io, Vector{Bedgraph.Record})
+	end
 
-@test Bag.records == open(Bag.file, "r") do io
-    seek(io, Bedgraph.Record)
-    return read(io, Vector{Bedgraph.Record})
-end
+	@test_nowarn mktemp() do path, io
+		header = Bedgraph.generate_basic_header(Bag.records)
+	    write(io, header, Bag.records)
 
-@test_nowarn mktemp() do path, io
-	header = Bedgraph.generateBasicHeader(Bag.records)
-    write(io, header, Bag.records)
+		seekstart(io)
+		@test Bag.records == read(io, Vector{Record})
+	end
 
-	seekstart(io)
-	@test Bag.records == read(io, Vector{Record})
-end
 
-# Not able to capture write(::IO, ::AbstractVector).
-# @test_nowarn mktemp() do path, io
-# 	# test AbstractVector
-# 	records = view(Bag.records, 2:4)
-# 	header = Bedgraph.generateBasicHeader(records)
-#     write(io, header, records)
-#
-# 	seekstart(io)
-# 	@test records == read(io, Vector{Record})
-# end
+	@test Record{Int} <: Record
 
-@test_nowarn mktemp() do path, io
-	header = Bedgraph.generateBasicHeader("chr19", Bag.records[1].first, Bag.records[end].last, bump_forward=false)
-	write(io, header, Bag.records)
+	@test_nowarn mktemp() do path, io
+	    write(io, Bag.records[[1,5,9]])
 
-	seekstart(io)
-	@test Bag.records == read(io, Vector{Record})
-end
+		seekstart(io)
+		@test Bag.records[[1,5,9]] == read(io, Vector{Record{Int}})
+	end
 
-@test_nowarn mktempdir() do path
-	outputfile = joinpath(path, "test.bedgraph")
-	header = Bedgraph.generateBasicHeader(Bag.records)
-	write(outputfile, header, Bag.records)
+	@test_nowarn mktemp() do path, io
+		header = Bedgraph.generate_basic_header(Bag.records)
+	    write(io, header, Bag.records)
 
-	@test Bag.records == read(outputfile, Vector{Record})
-end
+		seekstart(io)
+		@test Bag.records == read(io, Vector{Record{Float64}})
+	end
+
+	# Not able to capture write(::IO, ::AbstractVector).
+	# @test_nowarn mktemp() do path, io
+	# 	# test AbstractVector
+	# 	records = view(Bag.records, 2:4)
+	# 	header = Bedgraph.generateBasicHeader(records)
+	#     write(io, header, records)
+	#
+	# 	seekstart(io)
+	# 	@test records == read(io, Vector{Record})
+	# end
+
+	@test_nowarn mktemp() do path, io
+		header = Bedgraph.generate_basic_header("chr19", Bag.records[1].first, Bag.records[end].last, bump_forward=false)
+		write(io, header, Bag.records)
+
+		seekstart(io)
+		@test Bag.records == read(io, Vector{Record})
+	end
+
+	@test_nowarn mktempdir() do path
+		outputfile = joinpath(path, "test.bedgraph")
+		header = Bedgraph.generate_basic_header(Bag.records)
+		write(outputfile, header, Bag.records)
+
+		@test Bag.records == read(outputfile, Vector{Record})
+	end
 
 end #testset I/O
 
 
 @testset "Matching" begin
 
-@test Bedgraph.isComment(Bag.comment1)
-@test Bedgraph.isBrowser(Bag.browser3)
+	@test Bedgraph.is_comment(Bag.comment1)
+	@test Bedgraph.is_browser(Bag.browser3)
 
-@test Bedgraph.isLikeRecord("1 2 3 4") == true
-@test Bedgraph.isLikeRecord(Bag.parameter_line) == false
-@test Bedgraph.isLikeRecord(Bag.parameter_line_4) == false
-@test Bedgraph.isLikeRecord(Bag.parameter_line_min) == false
-@test Bedgraph.isLikeRecord(Bag.parameter_line_long) == false
-@test Bedgraph.isLikeRecord(Bag.line1) == true
-@test Bedgraph.isLikeRecord(Bag.line1_2) == true
-@test Bedgraph.isLikeRecord(Bag.line1_3) == true
-@test Bedgraph.isLikeRecord(Bag.line1_4) == true
-@test Bedgraph.isLikeRecord(Bag.line1_5) == true
-@test Bedgraph.isLikeRecord(Bag.line1_6) == true
-@test Bedgraph.isLikeRecord(Bag.line1_7) == true
+	@test Bedgraph.is_like_record("1 2 3 4") == true
+	@test Bedgraph.is_like_record(Bag.parameter_line) == false
+	@test Bedgraph.is_like_record(Bag.parameter_line_4) == false
+	@test Bedgraph.is_like_record(Bag.parameter_line_min) == false
+	@test Bedgraph.is_like_record(Bag.parameter_line_long) == false
+	@test Bedgraph.is_like_record(Bag.line1) == true
+	@test Bedgraph.is_like_record(Bag.line1_2) == true
+	@test Bedgraph.is_like_record(Bag.line1_3) == true
+	@test Bedgraph.is_like_record(Bag.line1_4) == true
+	@test Bedgraph.is_like_record(Bag.line1_5) == true
+	@test Bedgraph.is_like_record(Bag.line1_6) == true
+	@test Bedgraph.is_like_record(Bag.line1_7) == true
 
 
-@test Bedgraph.isLikeRecord(Bag.line_other_space) == true
-@test Bedgraph.isLikeRecord(Bag.line_other) == true
-@test Bedgraph.isLikeRecord(Bag.line_other_chrom) == true
+	@test Bedgraph.is_like_record(Bag.line_other_space) == true
+	@test Bedgraph.is_like_record(Bag.line_other) == true
+	@test Bedgraph.is_like_record(Bag.line_other_chrom) == true
 
 end #testset Matching
 
 
 @testset "Line Splitting" begin
 
-@test Bedgraph._splitLine(Bag.line1)[1:4] == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_2)[1:4] == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_3)[1:4] == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_4)[1:4] == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_5)[1:4] == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_6)[1:4] == Bag.cells1
-@test Bedgraph._splitLine(Bag.line1_7)[1:4] == Bag.cells1
+	@test Bedgraph._split_line(Bag.line1)[1:4] == Bag.cells1
+	@test Bedgraph._split_line(Bag.line1_2)[1:4] == Bag.cells1
+	@test Bedgraph._split_line(Bag.line1_3)[1:4] == Bag.cells1
+	@test Bedgraph._split_line(Bag.line1_4)[1:4] == Bag.cells1
+	@test Bedgraph._split_line(Bag.line1_5)[1:4] == Bag.cells1
+	@test Bedgraph._split_line(Bag.line1_6)[1:4] == Bag.cells1
+	@test Bedgraph._split_line(Bag.line1_7)[1:4] == Bag.cells1
 
 end #testset Parsing
 
 
 @testset "Sorting" begin
 
-# Testing isless function.
-@test isless(Record(Bag.line1), Record(Bag.line2)) == true
-@test isless(Record(Bag.line2), Record(Bag.line1)) == false
+	# Testing isless function.
+	@test isless(Record(Bag.line1), Record(Bag.line2)) == true
+	@test isless(Record(Bag.line2), Record(Bag.line1)) == false
 
-unordered = Bag.records[[9,4,5,6,8,7,1,3,2]]
+	unordered = Bag.records[[9,4,5,6,8,7,1,3,2]]
 
-@test Bag.records != unordered
-@test Bag.records == sort(unordered)
+	@test Bag.records != unordered
+	@test Bag.records == sort(unordered)
 
-# Testing sort by concept.
-@test Bag.records == sort(unordered, by=x->[x.chrom, x.first, x.last])
+	# Testing sort by concept.
+	@test Bag.records == sort(unordered, by=x->[x.chrom, x.first, x.last])
 
 end #testset Sorting
 
 
 @testset "Conversion" begin
 
-@test Bag.record1 == convert(Record, Bag.line1)
-@test Bag.record1 == Record(Bag.line1)
-@test Bag.record1 == convert(Record, string(Bag.line1, " ", "extra_cell"))
-@test Bag.record1 == Record(string(Bag.line1, " ", "extra_cell"))
+	@test Bag.record1 == convert(Record, Bag.line1)
+	@test Bag.record1 == Record(Bag.line1)
+	@test Bag.record1 == convert(Record, string(Bag.line1, " ", "extra_cell"))
+	@test Bag.record1 == Record(string(Bag.line1, " ", "extra_cell"))
 
 end #testset Conversion
 
 @testset "Internal Helpers" begin
 
-@test Bedgraph._range(Bag.record1) == Bag.record1.first : Bag.record1.last - 1
-@test Bedgraph._range(Bag.record1, right_open=false) == (Bag.record1.first + 1 ) : Bag.record1.last
+	@test Bedgraph._range(Bag.record1) == Bag.record1.first : Bag.record1.last - 1
+	@test Bedgraph._range(Bag.record1, right_open=false) == (Bag.record1.first + 1 ) : Bag.record1.last
 
-@test Bedgraph._range(Bag.records) == Bag.record1.first : Record(Bag.line9).last - 1
-@test Bedgraph._range(Bag.records, right_open=false) == Bag.record1.first + 1 : Record(Bag.line9).last
+	@test Bedgraph._range(Bag.records) == Bag.record1.first : Record(Bag.line9).last - 1
+	@test Bedgraph._range(Bag.records, right_open=false) == Bag.record1.first + 1 : Record(Bag.line9).last
 
 
-bumped_records = Bedgraph._bumpForward(Bag.records)
-@test bumped_records[1].first == (Bag.records[1].first + 1)
-@test bumped_records[1].last == (Bag.records[1].last + 1)
+	bumped_records = Bedgraph._bump_forward(Bag.records)
+	@test bumped_records[1].first == (Bag.records[1].first + 1)
+	@test bumped_records[1].last == (Bag.records[1].last + 1)
 
-bumped_records = Bedgraph._bumpBack(Bag.records)
-@test bumped_records[1].first == (Bag.records[1].first - 1)
-@test bumped_records[1].last == (Bag.records[1].last - 1)
-
+	bumped_records = Bedgraph._bump_back(Bag.records)
+	@test bumped_records[1].first == (Bag.records[1].first - 1)
+	@test bumped_records[1].last == (Bag.records[1].last - 1)
 
 end #testset Internal Helpers
 
 @testset "Utilities" begin
 
-# Expansion and compression test.
-(n, expanded_value, expanded_chrom) = Bedgraph.expand(Bag.chroms, Bag.firsts, Bag.lasts, Bag.values)
-records = Bedgraph.compress(expanded_chrom, n, expanded_value)
-@test Bag.chroms == Bedgraph.chrom.(records)
-@test Bag.firsts == first.(records)
-@test Bag.lasts == last.(records)
-@test Bag.values == Bedgraph.value.(records)
+	# Expansion and compression test.
+	(n, expanded_value, expanded_chrom) = Bedgraph.expand(Bag.chroms, Bag.firsts, Bag.lasts, Bag.values)
+	records = Bedgraph.compress(expanded_chrom, n, expanded_value)
+	@test Bag.chroms == Bedgraph.chrom.(records)
+	@test Bag.firsts == first.(records)
+	@test Bag.lasts == last.(records)
+	@test Bag.values == Bedgraph.value.(records)
 
-# Expansion and compression test (checking if the 3rd returned item can be ignored).
-(n, expanded_value) = Bedgraph.expand(Bag.chroms, Bag.firsts, Bag.lasts, Bag.values)
-records = Bedgraph.compress(expanded_chrom, n, expanded_value) #Note: reusing expanded_chrom from above.
-@test Bag.firsts == first.(records)
-@test Bag.lasts == last.(records)
-@test Bag.values == Bedgraph.value.(records)
+	# Expansion and compression test (checking if the 3rd returned item can be ignored).
+	(n, expanded_value) = Bedgraph.expand(Bag.chroms, Bag.firsts, Bag.lasts, Bag.values)
+	records = Bedgraph.compress(expanded_chrom, n, expanded_value) #Note: reusing expanded_chrom from above.
+	@test Bag.firsts == first.(records)
+	@test Bag.lasts == last.(records)
+	@test Bag.values == Bedgraph.value.(records)
 
-# Expansion and compression test.
-n, expanded_value = Bedgraph.expand(Bag.records, right_open=true)
-compressed_records = Bedgraph.compress("chr19", n, expanded_value, right_open=true)
-@test compressed_records == Bag.records
+	# Expansion and compression test.
+	n, expanded_value = Bedgraph.expand(Bag.records, right_open=true)
+	compressed_records = Bedgraph.compress("chr19", n, expanded_value, right_open=true)
+	@test compressed_records == Bag.records
 
-# Expansion and compression of Records.
-n, expanded_value = Bedgraph.expand(Bag.records, right_open=false)
-compressed_records = Bedgraph.compress("chr19", n, expanded_value, right_open=false)
-@test compressed_records == Bag.records
+	# Expansion and compression of Records.
+	n, expanded_value = Bedgraph.expand(Bag.records, right_open=false)
+	compressed_records = Bedgraph.compress("chr19", n, expanded_value, right_open=false)
+	@test compressed_records == Bag.records
 
-# Expansion and compression of Arrays via convert.
-n, expanded_value = Bedgraph.expand("chr19", Bag.firsts, Bag.lasts, Bag.values)
-compressed_records = Bedgraph.compress("chr19", n, expanded_value)
-@test compressed_records == Bag.records
+	# Expansion and compression of Arrays via convert.
+	n, expanded_value = Bedgraph.expand("chr19", Bag.firsts, Bag.lasts, Bag.values)
+	compressed_records = Bedgraph.compress("chr19", n, expanded_value)
+	@test compressed_records == Bag.records
 
 end #testset Utilities
-
-@testset "Deprecated" begin
-	@test (@test_deprecated convert(Vector{Record}, Bag.chroms, Bag.firsts, Bag.lasts, Bag.values)) == Bag.records
-end
 
 end # total testset

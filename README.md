@@ -2,7 +2,7 @@
 
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
 [![Build Status](https://travis-ci.com/CiaranOMara/Bedgraph.jl.svg?branch=master)](https://travis-ci.com/CiaranOMara/Bedgraph.jl)
-[![Build status](https://ci.appveyor.com/api/projects/status/jny2ep4u3cmly8pj/branch/master?svg=true)](https://ci.appveyor.com/project/CiaranOMara/Bedgraph-jl/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/u0enn28i4ea1f744/branch/master?svg=true)](https://ci.appveyor.com/project/CiaranOMara/bedgraph-jl/branch/master)
 [![Build Status](https://api.cirrus-ci.com/github/CiaranOMara/Bedgraph.jl.svg?branch=master)](https://cirrus-ci.com/github/CiaranOMara/Bedgraph.jl)
 [![codecov.io](http://codecov.io/github/CiaranOMara/Bedgraph.jl/coverage.svg?branch=master)](http://codecov.io/github/CiaranOMara/Bedgraph.jl?branch=master)
 
@@ -77,7 +77,7 @@ records = Bedgraph.Record.(chroms, firsts, lasts, values)
 
 sort!(records)
 
-header = Bedgraph.generateBasicHeader(records)
+header = Bedgraph.generate_basic_header(records)
 
 write("data.bedgraph", header, records)
 ```
@@ -87,7 +87,7 @@ write("data.bedgraph", header, records)
 using Bedgraph
 
 records = [Record("chr19", 49302000, 49302300, -1.0), Record("chr19", 49302300, 49302600, -1.75)]
-header = Bedgraph.generateBasicHeader("chr19", records[1].first, records[end].last, bump_forward=false)
+header = Bedgraph.generate_basic_header("chr19", records[1].first, records[end].last, bump_forward=false)
 
 open(output_file, "w") do io
     write(io, header, records)
