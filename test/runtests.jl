@@ -318,8 +318,4 @@ end #testset Internal Helpers
 
 end #testset Utilities
 
-@testset "Deprecated" begin
-	@test (@test_deprecated convert(Vector{Record}, Bag.chroms, Bag.firsts, Bag.lasts, Bag.values)) == Bag.records
-end
-
 end # total testset
