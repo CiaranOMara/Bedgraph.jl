@@ -78,7 +78,6 @@ function read_records(io::IO, sink, el::Type=Record)
     end
 
     return sink
-
 end
 
 read_records(io::IO, sink::Type=Vector{Record}, el::Type=Record) = read_records(io::IO, sink(), el)
