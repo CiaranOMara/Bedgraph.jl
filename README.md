@@ -6,7 +6,8 @@
 [![Build Status](https://api.cirrus-ci.com/github/CiaranOMara/Bedgraph.jl.svg?branch=master)](https://cirrus-ci.com/github/CiaranOMara/Bedgraph.jl)
 [![codecov.io](http://codecov.io/github/CiaranOMara/Bedgraph.jl/coverage.svg?branch=master)](http://codecov.io/github/CiaranOMara/Bedgraph.jl?branch=master)
 
-> This project will try to follow the [semver](http://semver.org) pro forma.
+> This project follows the [semver](http://semver.org) pro forma and uses the [git-flow branching model](http://nvie.com/git-model "original
+blog post").
 
 ## Description
 This package provides read and write support for [Bedgraph files](https://genome.ucsc.edu/goldenPath/help/bedgraph.html).
