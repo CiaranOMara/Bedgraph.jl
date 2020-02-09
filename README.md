@@ -2,14 +2,15 @@
 
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
 [![Build Status](https://travis-ci.com/CiaranOMara/Bedgraph.jl.svg?branch=master)](https://travis-ci.com/CiaranOMara/Bedgraph.jl)
-[![Build status](https://ci.appveyor.com/api/projects/status/jny2ep4u3cmly8pj/branch/master?svg=true)](https://ci.appveyor.com/project/CiaranOMara/Bedgraph-jl/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/u0enn28i4ea1f744/branch/master?svg=true)](https://ci.appveyor.com/project/CiaranOMara/bedgraph-jl/branch/master)
 [![Build Status](https://api.cirrus-ci.com/github/CiaranOMara/Bedgraph.jl.svg?branch=master)](https://cirrus-ci.com/github/CiaranOMara/Bedgraph.jl)
 [![codecov.io](http://codecov.io/github/CiaranOMara/Bedgraph.jl/coverage.svg?branch=master)](http://codecov.io/github/CiaranOMara/Bedgraph.jl?branch=master)
 
-> This project will try to follow the [semver](http://semver.org) pro forma.
+> This project follows the [semver](http://semver.org) pro forma and uses the [git-flow branching model](http://nvie.com/git-model "original
+blog post").
 
 ## Description
-This package provides read and write support for [Bedgraph files](https://genome.ucsc.edu/goldenPath/help/bedgraph.html), as well as other useful utilities.
+This package provides read and write support for [Bedgraph files](https://genome.ucsc.edu/goldenPath/help/bedgraph.html).
 
 > **Note:**  this package does not currently handle bedGraph meta data such as the track definition or browser lines.
 
@@ -77,7 +78,7 @@ records = Bedgraph.Record.(chroms, firsts, lasts, values)
 
 sort!(records)
 
-header = Bedgraph.generateBasicHeader(records)
+header = Bedgraph.generate_basic_header(records)
 
 write("data.bedgraph", header, records)
 ```
@@ -87,55 +88,10 @@ write("data.bedgraph", header, records)
 using Bedgraph
 
 records = [Record("chr19", 49302000, 49302300, -1.0), Record("chr19", 49302300, 49302600, -1.75)]
-header = Bedgraph.generateBasicHeader("chr19", records[1].first, records[end].last, bump_forward=false)
+header = Bedgraph.generate_basic_header("chr19", records[1].first, records[end].last, bump_forward=false)
 
 open(output_file, "w") do io
     write(io, header, records)
 end
 
-```
-### Compression and decompression of data
-
-#### Compress data values
-Compress data to chromosome coordinates of the zero-based, half-open format.
-
-```julia
-using Bedgraph
-
-chrom "chr1"
-n = 49302000:49304700
-decompressed_values = [-1.0, -1.0, -1.0, ..., 1.00, 1.00, 1.00]
-
-compressed_records = Bedgraph.compress(chrom, n, decompressed_values)
-```
-
-```julia
-using Bedgraph
-
-const records = [Record("chr19", 49302000, 49302300, -1.0), Record("chr19", 49302300, 49302600, -1.75)]
-
-compressed_records = Bedgraph.compress("chr19", n, decompressed_value)
-```
-
-#### Decompress record data
-Decompress chromosome coordinates from the zero-based, half-open format.
-> **Note:**  please be aware of the order of returned items.
-
-```julia
-using Bedgraph
-
-const firsts = [49302000, 49302300, 49302600, 49302900, 49303200, 49303500, 49303800, 49304100, 49304400]
-const lasts = [49302300, 49302600, 49302900, 49303200, 49303500, 49303800, 49304100, 49304400, 49304700]
-const values = [-1.0, -0.75, -0.50, -0.25, 0.0, 0.25, 0.50, 0.75, 1.00]
-
-(n, decompressed_values, decompressed_chroms) = Bedgraph.expand(chroms, firsts, lasts, values)
-```
-
-```julia
-
-using Bedgraph
-
-const records = [Record("chr19", 49302000, 49302300, -1.0), Record("chr19", 49302300, 49302600, -1.75)]
-
-n, decompressed_values, decompressed_chroms = Bedgraph.expand(records)
 ```

@@ -22,7 +22,7 @@ function Base.convert(::Type{String}, header::BedgraphHeader{<:AbstractVector{<:
 end
 
 "Generate a basic bedGraph header given a vector of [`Record`](@ref)s."
-function generateBasicHeader(records::AbstractVector{Record}; bump_forward=true) #Note: we assume that records are sorted by chrom and left position.
+function generate_basic_header(records::AbstractVector{<:Record}; bump_forward=true) #Note: we assume that records are sorted by chrom and left position.
 
     chrom = records[1].chrom
 
@@ -37,15 +37,15 @@ function generateBasicHeader(records::AbstractVector{Record}; bump_forward=true)
     return BedgraphHeader(["browser position $chrom:$pos_start-$pos_end", "track type=bedGraph"])
 end
 
-generateBasicHeader(chrom::AbstractString, pos_start::Int, pos_end::Int; bump_forward=true) = generateBasicHeader([Record(chrom, pos_start, pos_end, 0)], bump_forward=bump_forward)
+generate_basic_header(chrom::AbstractString, pos_start::Int, pos_end::Int; bump_forward=true) = generate_basic_header([Record(chrom, pos_start, pos_end, 0)], bump_forward=bump_forward)
 
 "Seek and then read bedGraph header into sink."
-function _readHeader(io::IO, sink)
+function read_header(io::IO, sink)
     position(io) == 0 || seekstart(io)
 
     line = readline(io)
 
-    while !eof(io) && !isLikeRecord(line) # TODO: seek more rebust check.
+    while !eof(io) && !is_like_record(line) # TODO: seek more rebust check.
         push!(sink, line)
         line = readline(io)
     end
@@ -55,7 +55,7 @@ end
 
 "Read bedGraph header into sink."
 function Base.read(io::IO, sink::Type{<:BedgraphHeader})
-    return _readHeader(io, sink())
+    return read_header(io, sink())
 end
 
 "Write bedGraph header to `IO` as `String`."

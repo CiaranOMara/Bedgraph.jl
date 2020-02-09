@@ -1,13 +1,17 @@
-export Record
-
 "The bedGraph record."
-struct Record
+struct Record{T<:Real}
     chrom::String
     first::Int
     last::Int
-    value::Real
+    value::T
 
-    Record(chrom, first, last, value) = new(_string(chrom), _int(first), _int(last), _real(value))
+    Record{T}(chrom::String, first::Int, last::Int, value::T) where {T} = new{T}(chrom, first, last, value)
+    Record{T}(chrom, first, last, value) where {T} = new{T}(_string(chrom), _int(first), _int(last), _real(value))
+end
+
+function Record(chrom, first, last, value)
+    v = _real(value)
+    return Record{typeof(v)}(chrom, first, last, v)
 end
 
 function _int(pos)
@@ -32,13 +36,14 @@ end
 
 
 function Base.:(==)(a::Record, b::Record)
-    return a.chrom  == b.chrom &&
+    return a.chrom == b.chrom &&
            a.first == b.first &&
-           a.last == b.last &&
+           a.last  == b.last &&
            a.value == b.value
 end
 
 function Base.isless(a::Record, b::Record, chrom_isless::Function=isless)
+
     if chrom_isless(a.chrom, b.chrom)
         return true
     end
@@ -56,7 +61,6 @@ function Base.isless(a::Record, b::Record, chrom_isless::Function=isless)
     end
 
     return false
-
 end
 
 function Base.convert(::Type{Vector{String}}, record::Record)
@@ -68,8 +72,13 @@ function Record(data::AbstractString)
 end
 
 function Base.convert(::Type{Record}, str::AbstractString)
-    data = _splitLine(str)
+    data = _split_line(str)
     return Record(data[1], data[2], data[3], data[4])
+end
+
+function Base.convert(::Type{Record{T}}, str::AbstractString) where T
+    data = _split_line(str)
+    return Record{T}(data[1], data[2], data[3], data[4])
 end
 
 "Access [`Record`](@ref)'s chrom field."
@@ -93,6 +102,6 @@ function value(record::Record)
 end
 
 ## Internal helper functions.
-function _splitLine(line::AbstractString)
+function _split_line(line::AbstractString)
     return split(line, r"\s", limit=5, keepempty=false) #Note: may return 5 elements.
 end
