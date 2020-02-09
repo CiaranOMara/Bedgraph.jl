@@ -286,40 +286,6 @@ bumped_records = Bedgraph._bump_back(Bag.records)
 
 end #testset Internal Helpers
 
-@testset "Utilities" begin
-
-# Expansion and compression test.
-(n, expanded_value, expanded_chrom) = Bedgraph.expand(Bag.chroms, Bag.firsts, Bag.lasts, Bag.values)
-records = Bedgraph.compress(expanded_chrom, n, expanded_value)
-@test Bag.chroms == Bedgraph.chrom.(records)
-@test Bag.firsts == first.(records)
-@test Bag.lasts == last.(records)
-@test Bag.values == Bedgraph.value.(records)
-
-# Expansion and compression test (checking if the 3rd returned item can be ignored).
-(n, expanded_value) = Bedgraph.expand(Bag.chroms, Bag.firsts, Bag.lasts, Bag.values)
-records = Bedgraph.compress(expanded_chrom, n, expanded_value) #Note: reusing expanded_chrom from above.
-@test Bag.firsts == first.(records)
-@test Bag.lasts == last.(records)
-@test Bag.values == Bedgraph.value.(records)
-
-# Expansion and compression test.
-n, expanded_value = Bedgraph.expand(Bag.records, right_open=true)
-compressed_records = Bedgraph.compress("chr19", n, expanded_value, right_open=true)
-@test compressed_records == Bag.records
-
-# Expansion and compression of Records.
-n, expanded_value = Bedgraph.expand(Bag.records, right_open=false)
-compressed_records = Bedgraph.compress("chr19", n, expanded_value, right_open=false)
-@test compressed_records == Bag.records
-
-# Expansion and compression of Arrays via convert.
-n, expanded_value = Bedgraph.expand("chr19", Bag.firsts, Bag.lasts, Bag.values)
-compressed_records = Bedgraph.compress("chr19", n, expanded_value)
-@test compressed_records == Bag.records
-
-end #testset Utilities
-
 @testset "Deprecated" begin
 	@test (@test_deprecated convert(Vector{Record}, Bag.chroms, Bag.firsts, Bag.lasts, Bag.values)) == Bag.records
 end
