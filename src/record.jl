@@ -14,6 +14,14 @@ function Record(chrom, first, last, value)
     return Record{typeof(v)}(chrom, first, last, v)
 end
 
+function Record(data) :: Record
+    return data
+end
+
+function Record{T}(data) :: Record{T} where T
+    return data
+end
+
 function _int(pos)
     return pos
 end
