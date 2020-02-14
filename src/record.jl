@@ -36,6 +36,18 @@ function Base.convert(::Type{Vector{String}}, record::Record)
     return String[record.chrom, string(record.first), string(record.last), string(record.value)]
 end
 
+function Base.convert(::Type{String}, record::Record, delim::String = " ")
+
+    strs = [
+        record.chrom,
+        string(record.first),
+        string(record.last),
+        string(record.value)
+    ]
+
+    return join(strs, delim)
+end
+
 "Access [`Record`](@ref)'s chrom field."
 function chrom(record::Record)
     return record.chrom
