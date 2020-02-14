@@ -64,16 +64,15 @@ function read_record(io::IO) :: Union{Nothing, Record}
 end
 
 "Read string into type's constructor."
-function Base.read(io::IO, obj::Type{<:Record})
-    line = readline(io)
-    return convert(obj, line)
+function Base.read(io::IO, ::Type{T}) :: T where T <: Record
+    return readline(io) #Note: converts to T.
 end
 
-function read_records(io::IO, sink, el::Type=Record)
+function read_records(io::IO, sink, ::Type{T}=Record) where T
     seekstart(io)
 
-    while !eof(seek(io, Record))#TODO: consider using el in seek.
-        record = read(io, el)
+    while !eof(seek(io, T))
+        record = read(io, T)
         push!(sink, record) #Note: converts Record to sink's eltype.
     end
 
