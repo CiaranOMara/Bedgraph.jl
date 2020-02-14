@@ -8,11 +8,5 @@ end
 
 "Write [`Record`](@ref) to `IO` as string."
 function Base.write(io::IO, record::Record)
-    # delim = '\t'
-    delim = ' '
-    strings = convert(Vector{String}, record)
-
-    Base.join(io, strings, delim)
-
-    return position(io)
+    return write(io, convert(String, record))
 end
