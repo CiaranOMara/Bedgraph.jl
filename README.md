@@ -1,8 +1,8 @@
 # Bedgraph.jl
 
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
-[![codecov.io](http://codecov.io/github/CiaranOMara/Bedgraph.jl/coverage.svg?branch=master)](http://codecov.io/github/CiaranOMara/Bedgraph.jl?branch=master)
 ![Unit Tests](https://github.com/CiaranOMara/Bedgraph.jl/workflows/Unit%20Tests/badge.svg?branch=master)
+[![codecov](https://codecov.io/gh/CiaranOMara/Bedgraph.jl/branch/master/graph/badge.svg?branch=master)](https://codecov.io/gh/CiaranOMara/Bedgraph.jl?branch=master)
 
 > This project follows the [semver](http://semver.org) pro forma and uses the [git-flow branching model](http://nvie.com/git-model "original
 blog post").
