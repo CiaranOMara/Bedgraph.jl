@@ -22,6 +22,21 @@ function Record{T}(data) :: Record{T} where T
     return data
 end
 
+function Base.convert(::Type{NamedTuple{names}}, record::Record) where {names}
+    return NamedTuple{names}((
+        record.chrom,
+        record.first,
+        record.last,
+        record.value,
+    ))
+end
+
+Base.convert(::Type{NamedTuple}, record::Record) = convert(NamedTuple{(:chrom, :first, :last, :value)}, record)
+
+function Base.convert(::Type{Record}, nt::NamedTuple{(:chrom, :first, :last, :value)})
+    return Record(nt.chrom, nt.first, nt.last, nt.value)
+end
+
 function Base.convert(::Type{Record}, str::AbstractString)
     data = _split_line(str)
     return Record(data[1], data[2], data[3], data[4])

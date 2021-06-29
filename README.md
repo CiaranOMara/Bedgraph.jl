@@ -91,5 +91,19 @@ header = Bedgraph.generate_basic_header("chr19", records[1].first, records[end].
 open(output_file, "w") do io
     write(io, header, records)
 end
+```
 
+#### Converting records
+
+Below are some examples of `Bedgraph.Record` conversions provided by this package.
+```julia
+using Bedgraph
+
+record = Record("chr1", 10, 20)
+
+# Convert record to NamedTuple.
+nt = convert(NamedTuple, record)
+
+# Convert record to NamedTuple and rename fields.
+nt = convert(NamedTuple{(:chrom, :left, :right, :value)}, record)
 ```
