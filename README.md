@@ -1,10 +1,8 @@
 # Bedgraph.jl
 
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
-[![Build Status](https://travis-ci.com/CiaranOMara/Bedgraph.jl.svg?branch=master)](https://travis-ci.com/CiaranOMara/Bedgraph.jl)
-[![Build status](https://ci.appveyor.com/api/projects/status/u0enn28i4ea1f744/branch/master?svg=true)](https://ci.appveyor.com/project/CiaranOMara/bedgraph-jl/branch/master)
-[![Build Status](https://api.cirrus-ci.com/github/CiaranOMara/Bedgraph.jl.svg?branch=master)](https://cirrus-ci.com/github/CiaranOMara/Bedgraph.jl)
-[![codecov.io](http://codecov.io/github/CiaranOMara/Bedgraph.jl/coverage.svg?branch=master)](http://codecov.io/github/CiaranOMara/Bedgraph.jl?branch=master)
+![Unit Tests](https://github.com/CiaranOMara/Bedgraph.jl/workflows/Unit%20Tests/badge.svg?branch=master)
+[![codecov](https://codecov.io/gh/CiaranOMara/Bedgraph.jl/branch/master/graph/badge.svg?branch=master)](https://codecov.io/gh/CiaranOMara/Bedgraph.jl?branch=master)
 
 > This project follows the [semver](http://semver.org) pro forma and uses the [git-flow branching model](http://nvie.com/git-model "original
 blog post").
@@ -93,5 +91,19 @@ header = Bedgraph.generate_basic_header("chr19", records[1].first, records[end].
 open(output_file, "w") do io
     write(io, header, records)
 end
+```
 
+#### Converting records
+
+Below are some examples of `Bedgraph.Record` conversions provided by this package.
+```julia
+using Bedgraph
+
+record = Record("chr1", 10, 20)
+
+# Convert record to NamedTuple.
+nt = convert(NamedTuple, record)
+
+# Convert record to NamedTuple and rename fields.
+nt = convert(NamedTuple{(:chrom, :left, :right, :value)}, record)
 ```
