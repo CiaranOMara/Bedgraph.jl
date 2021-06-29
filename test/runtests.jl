@@ -84,8 +84,9 @@ end
 
 	# Seek test.
 	open(Bag.file, "r") do io
+		@info "" readline(io, keep = true)
 	    seek(io, Record)
-	    # @test position(io) == 536 #TOOD: determine why the returned position on windows machines is 545.
+	    @test position(io) == 536 #TODO: determine why the returned position on windows machines is 545.
 	    @test readline(io) == Bag.line1
 	end
 
