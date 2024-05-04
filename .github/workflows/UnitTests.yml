@@ -4,6 +4,11 @@ on:
   - push
   - pull_request
 
+# needed to allow julia-actions/cache to delete old caches that it has created
+permissions:
+  actions: write
+  contents: read
+
 jobs:
   test:
     name: Julia ${{ matrix.julia-version }} - ${{ matrix.os }} - ${{ matrix.julia-arch }} - ${{ github.event_name }}
@@ -13,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         julia-version:
-          - '1.0' # LTS
+          - '1.6' # LTS
           - '1'
         julia-arch: [x64, x86]
         os: [ubuntu-latest, windows-latest, macOS-latest]
@@ -29,17 +34,23 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Setup Julia
         uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.julia-version }}
+          arch: ${{ matrix.julia-arch }}
+      - uses: julia-actions/cache@v1
+      - uses: julia-actions/julia-buildpkg@v1
       - name: Run Tests
         uses: julia-actions/julia-runtest@v1
+        with:
+          annotate: true
       - name: Create CodeCov
         uses: julia-actions/julia-processcoverage@v1
       - name: Upload CodeCov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v4
         with:
-          file: ${{ steps.coverage-processing.outputs.lcov-file }}
+          files: lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
