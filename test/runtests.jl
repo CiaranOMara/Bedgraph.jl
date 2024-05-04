@@ -287,26 +287,32 @@ end #testset Internal Helpers
 
 @testset "NamedTuple" begin
 
-	record = Record(Bag.line1)
+	# Check strictly named fields.
 
-	nt = (
-		chrom = Bag.chroms[1],
-		first = Bag.firsts[1],
-		last = Bag.lasts[1],
-		value = Bag.values[1],
+	nt_strict_names = (
+		chrom = Bag.record1.chrom, 
+		first=Bag.record1.first, 
+		last=Bag.record1.last, 
+		value=Bag.record1.value
 	)
 
-	@test record == Record(nt)
+	@test convert(NamedTuple{(:chrom, :first, :last, :value)}, Bag.record1) == convert(NamedTuple, Bag.record1) == nt_strict_names
+	@test Bag.record1 == convert(Record, nt_strict_names)
+	@test Bag.record1 == Record(nt_strict_names)
 
-	@test convert(NamedTuple{(:chrom, :first, :last, :value)}, record) == convert(NamedTuple, record) == nt
+	# Check loosely named fields.
 
-	# Check renaming of fields.
-	@test convert(NamedTuple{(:chrom, :left, :right, :value)}, record) == (
-		chrom = Bag.chroms[1],
-		left = Bag.firsts[1],
-		right = Bag.lasts[1],
-		value = Bag.values[1],
+	nt_loose_names = (
+		chrom = Bag.record1.chrom, 
+		left=Bag.record1.first, 
+		right=Bag.record1.last, 
+		value=Bag.record1.value
 	)
+
+	@test convert(NamedTuple{(:chrom, :left, :right, :value)}, Bag.record1) == nt_loose_names
+	@test Bag.record1 == convert(Record, nt_loose_names)
+	@test Bag.record1 == Record(nt_loose_names)
+
 end
 
 end # total testset

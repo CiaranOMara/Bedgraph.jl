@@ -33,8 +33,14 @@ end
 
 Base.convert(::Type{NamedTuple}, record::Record) = convert(NamedTuple{(:chrom, :first, :last, :value)}, record)
 
-function Base.convert(::Type{Record}, nt::NamedTuple{(:chrom, :first, :last, :value)})
-    return Record(nt.chrom, nt.first, nt.last, nt.value)
+function Base.convert(::Type{T}, nt::NamedTuple{(:chrom, :first, :last, :value),Tuple{String, Int, Int, R}}) where {R <: Real, T<: Bedgraph.Record}
+    @debug "Convert - strictly named tuples."
+    return T(nt.chrom, nt.first, nt.last, nt.value)
+end
+
+function Base.convert(::Type{T}, nt::NamedTuple{names,Tuple{String, Int, Int, R}}) where {R <: Real, names, T<: Bedgraph.Record}
+    @debug "Convert - loosely named tuples."
+    return T(nt[1], nt[2], nt[3], nt[4])
 end
 
 function Base.convert(::Type{Record}, str::AbstractString)
